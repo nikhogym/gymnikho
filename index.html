@@ -79,32 +79,35 @@
                 <div id="botoesAtalhoFicha" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
             </div>
 
+            <input type="text" id="ex" placeholder="Escolha ou digite o exercício" list="listaExerciciosMusculacao" style="margin-bottom: 10px; text-align: left; padding-left: 15px;" oninput="buscarUltimoPeso(this.value)">
+            
+            <datalist id="listaExerciciosMusculacao">
+                <option value="Supino Reto">
+                <option value="Supino Inclinado">
+                <option value="Crucifixo">
+                <option value="Agachamento Livre">
+                <option value="Leg Press">
+                <option value="Cadeira Extensora">
+                <option value="Cadeira Flexora">
+                <option value="Puxada Alta">
+                <option value="Remada Curvada">
+                <option value="Rosca Direta">
+                <option value="Rosca Martelo">
+                <option value="Tríceps Pulley">
+                <option value="Tríceps Corda">
+                <option value="Desenvolvimento">
+                <option value="Elevação Lateral">
+                <option value="Levantamento Terra">
+            </datalist>
+
             <div class="input-grid">
-                <input type="text" id="ex" placeholder="Nome" list="listaExercicios" oninput="buscarUltimoPeso(this.value)">
                 <input type="number" id="sets" placeholder="Sér.">
                 <input type="number" id="reps" placeholder="Rep.">
                 <input type="number" id="peso" placeholder="Kg">
-                
-                <datalist id="listaExercicios">
-                    <option value="Supino Reto">
-                    <option value="Supino Inclinado">
-                    <option value="Agachamento Livre">
-                    <option value="Leg Press">
-                    <option value="Puxada Alta">
-                    <option value="Remada Curvada">
-                    <option value="Rosca Direta">
-                    <option value="Rosca Martelo">
-                    <option value="Tríceps Pulley">
-                    <option value="Elevação Lateral">
-                    <option value="Desenvolvimento">
-                    <option value="Levantamento Terra">
-                    <option value="Cadeira Extensora">
-                    <option value="Cadeira Flexora">
-                </datalist>
             </div>
             <div id="referenciaPeso" style="margin-bottom: 10px;"></div>
             
-            <button class="btn btn-add" onclick="adicionar()">Adicionar Exercício</button>
+            <button class="btn btn-add" onclick="adicionar()">Adicionar à Lista</button>
             <div class="cal-box">
                 <span class="cal-label">🔥 Calorias da Musculação</span>
                 <input type="number" id="calMusculo" placeholder="0 kcal">
@@ -175,7 +178,6 @@
 </div>
 
 <script>
-    // --- CONFIGURAÇÃO GOOGLE SHEETS ---
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjhUFfkvnlz-AnpSmgA6ZXeASbeBm_7nHl6cFDuKTuIWVx_Iv1Aq8pb_M8RcxMa0ly/exec";
 
     const bancoDicas = {
