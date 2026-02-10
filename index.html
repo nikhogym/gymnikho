@@ -25,44 +25,27 @@
         .card { background: var(--card); padding: 20px; border-radius: 22px; margin-bottom: 15px; border: 1px solid #2C2C2E; }
         .section-title { font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: bold; }
         
-        .input-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        input, select, textarea { background: var(--input-bg); border: 1px solid #3A3A3C; border-radius: 12px; color: white; padding: 12px; font-size: 14px; width: 100%; outline: none; }
+        .input-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 16px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        input, select, textarea { background: var(--input-bg); border: 1px solid #3A3A3C; border-radius: 12px; color: white; padding: 12px; font-size: 14px; outline: none; width: 100%; }
+        input:focus { border-color: var(--primary); }
+
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 16px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.1s; }
+        .btn:active { opacity: 0.6; transform: scale(0.98); }
         .btn-add { background: var(--primary); color: white; }
         .btn-finish { background: var(--success); color: white; margin-top: 15px; }
-        .btn-load { background: #3A3A3C; color: var(--primary); padding: 8px; font-size: 12px; margin-top: 10px; border-radius: 10px; width: auto; display: inline-block; }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 10px; font-size: 13px; border-radius: 12px; flex: 1; margin-top: 10px; }
+        .btn-dropdown { background: #3A3A3C; color: white; padding: 12px; border-radius: 12px; width: 50px; flex-shrink: 0; font-size: 18px; display: flex; align-items: center; justify-content: center; }
 
         ul { list-style: none; padding: 0; margin-top: 15px; }
         li { background: var(--input-bg); padding: 15px; border-radius: 15px; margin-bottom: 10px; border-left: 5px solid var(--primary); }
-        .ex-row { display: flex; justify-content: space-between; align-items: center; }
-        .btn-dica { background: #3A3A3C; color: var(--primary); border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; }
         
-        .tag-musculo { font-size: 10px; background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block; text-transform: uppercase; }
-        .last-weight-info { font-size: 11px; color: var(--success); margin-top: 4px; display: block; font-weight: bold; }
-
-        #modalDica { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: var(--card); width: 100%; max-width: 350px; border-radius: 25px; padding: 25px; text-align: center; border: 1px solid #3A3A3C; }
-        
-        .cal-box { background: #2C2C2E; padding: 12px; border-radius: 12px; margin-top: 10px; border: 1px solid #3A3A3C; }
-        .cal-label { font-size: 12px; color: #8E8E93; margin-bottom: 5px; display: block; }
-
-        .historico-item { background: var(--card); border: 1px solid #3A3A3C; padding: 15px; border-radius: 18px; margin-bottom: 10px; position: relative; }
-        .delete-btn { color: var(--danger); font-size: 18px; position: absolute; right: 15px; top: 12px; cursor: pointer; }
-        
-        .ficha-item { background: #2C2C2E; padding: 15px; border-radius: 15px; margin-bottom: 10px; }
+        .last-weight-info { font-size: 11px; color: var(--success); margin-bottom: 8px; display: block; font-weight: bold; }
+        #historico { margin-top: 20px; }
+        .historico-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 10px; border: 1px solid #3A3A3C; }
     </style>
 </head>
 <body>
-
-<div id="modalDica" onclick="fecharDica()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 id="modalTitulo" style="margin-top:0; color:var(--primary)">Dica da IA</h3>
-        <p id="modalInstrucao" style="color: #FFFFFF; font-size: 15px; line-height: 1.6; text-align: left;"></p>
-        <button class="btn btn-add" onclick="fecharDica()">Entendido</button>
-    </div>
-</div>
 
 <div class="container">
     <div class="tabs">
@@ -74,361 +57,153 @@
     <div id="treino" class="content active">
         <div class="card">
             <div class="section-title">🏋️ Musculação</div>
-            <div style="margin-bottom: 15px;">
-                <span style="font-size: 12px; color: #8E8E93;">Carregar da Ficha:</span><br>
-                <div id="botoesAtalhoFicha" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+            
+            <div id="referenciaPeso"></div>
+            
+            <div class="input-row">
+                <input type="text" id="ex" placeholder="Nome do exercício" list="listaAprendida" oninput="buscarUltimoPeso(this.value)">
+                <button class="btn-dropdown" onclick="document.getElementById('ex').focus();">▾</button>
             </div>
 
-            <input type="text" id="ex" placeholder="Escolha ou digite o exercício" list="listaExerciciosMusculacao" style="margin-bottom: 10px; text-align: left; padding-left: 15px;" oninput="buscarUltimoPeso(this.value)">
-            
-            <datalist id="listaExerciciosMusculacao">
-                <option value="Supino Reto">
-                <option value="Supino Inclinado">
-                <option value="Crucifixo">
-                <option value="Agachamento Livre">
-                <option value="Leg Press">
-                <option value="Cadeira Extensora">
-                <option value="Cadeira Flexora">
-                <option value="Puxada Alta">
-                <option value="Remada Curvada">
-                <option value="Rosca Direta">
-                <option value="Rosca Martelo">
-                <option value="Tríceps Pulley">
-                <option value="Tríceps Corda">
-                <option value="Desenvolvimento">
-                <option value="Elevação Lateral">
-                <option value="Levantamento Terra">
-            </datalist>
+            <datalist id="listaAprendida"></datalist>
 
             <div class="input-grid">
                 <input type="number" id="sets" placeholder="Sér.">
                 <input type="number" id="reps" placeholder="Rep.">
                 <input type="number" id="peso" placeholder="Kg">
             </div>
-            <div id="referenciaPeso" style="margin-bottom: 10px;"></div>
             
             <button class="btn btn-add" onclick="adicionar()">Adicionar à Lista</button>
-            <div class="cal-box">
-                <span class="cal-label">🔥 Calorias da Musculação</span>
-                <input type="number" id="calMusculo" placeholder="0 kcal">
+            
+            <div style="margin-top:15px; background:#2C2C2E; padding:12px; border-radius:12px;">
+                <span style="font-size:12px; color:#8E8E93">🔥 Calorias Musculação</span>
+                <input type="number" id="calMusculo" placeholder="0 kcal" style="margin-top:5px">
             </div>
+            
             <ul id="listaAtual"></ul>
         </div>
 
         <div class="card">
             <div class="section-title">🏃 Cardio</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <div class="input-row">
                 <select id="cardioTipo" style="flex: 2;">
                     <option value="Esteira">Esteira</option>
                     <option value="Bicicleta">Bicicleta</option>
-                    <option value="Elíptico">Elíptico</option>
                     <option value="Corda">Corda</option>
                 </select>
                 <input type="number" id="cardioTempo" placeholder="Min" style="flex: 1;">
             </div>
-            <div class="cal-box">
-                <span class="cal-label">🔥 Calorias do Cardio</span>
-                <input type="number" id="calCardio" placeholder="0 kcal">
+            <div style="background:#2C2C2E; padding:12px; border-radius:12px;">
+                <span style="font-size:12px; color:#8E8E93">🔥 Calorias Cardio</span>
+                <input type="number" id="calCardio" placeholder="0 kcal" style="margin-top:5px">
             </div>
             <button class="btn btn-finish" onclick="finalizar()">Finalizar e Sincronizar</button>
         </div>
 
-        <h3 style="margin-left: 10px;">📜 Histórico</h3>
         <div id="historico"></div>
-    </div>
-
-    <div id="fichas" class="content">
-        <div class="card">
-            <div class="section-title">📝 Nova Ficha</div>
-            <input type="text" id="tituloFicha" placeholder="Ex: Treino A" style="margin-bottom: 10px;">
-            <textarea id="textoFicha" placeholder="DICA: Coloque um exercício por linha." rows="4"></textarea>
-            <button class="btn btn-add" onclick="salvarFicha()">Salvar Ficha</button>
-        </div>
-        <div id="listaFichas"></div>
-    </div>
-
-    <div id="grafico" class="content">
-        <div class="card">
-            <div class="section-title">📊 Evolução</div>
-            <select id="tipoGrafico" onchange="atualizarInterfaceGrafico()" style="margin-bottom: 10px;">
-                <option value="calorias">🔥 Calorias Totais</option>
-                <option value="carga">🏋️ Carga por Exercício</option>
-            </select>
-            
-            <div id="containerFiltroEx" style="display:none; margin-bottom: 15px;">
-                <span style="font-size: 12px; color: #8E8E93;">Escolha o Exercício:</span>
-                <select id="selectExGrafico" onchange="renderGrafico()"></select>
-            </div>
-
-            <div id="totalCalsLabel" style="text-align:center; color:var(--success); font-weight:bold; margin-bottom:15px;">Total Geral: 0 kcal</div>
-            <div style="height: 300px; width: 100%;">
-                <canvas id="meuGrafico"></canvas>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="section-title">💾 Backup Local</div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-outline" onclick="exportarDados()">📤 Exportar</button>
-                <button class="btn-outline" onclick="document.getElementById('importFile').click()">📥 Importar</button>
-                <input type="file" id="importFile" style="display:none" onchange="importarDados(this)">
-            </div>
-        </div>
     </div>
 </div>
 
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjhUFfkvnlz-AnpSmgA6ZXeASbeBm_7nHl6cFDuKTuIWVx_Iv1Aq8pb_M8RcxMa0ly/exec";
 
-    const bancoDicas = {
-        "supino": { g: "Peitoral", d: "Mantenha o peito estufado e as escápulas presas no banco." },
-        "agachamento": { g: "Pernas/Glúteo", d: "Mantenha o tronco ereto e desça jogando o quadril para trás." },
-        "rosca": { g: "Bíceps", d: "Mantenha os cotovelos fixos ao lado do tronco." },
-        "terra": { g: "Costas/Pernas", d: "Mantenha a barra colada nas canelas. Coluna sempre neutra." },
-        "puxada": { g: "Costas", d: "Puxe a barra em direção ao peito, fechando as escápulas." },
-        "triceps": { g: "Tríceps", d: "Mantenha o cotovelo parado e estenda o braço completamente." },
-        "elevacao": { g: "Ombros", d: "Suba os braços até a linha dos ombros, cotovelos levemente flexionados." },
-        "leg": { g: "Pernas", d: "Não tire a lombar do banco e não estenda totalmente o joelho." },
-        "padrao": { g: "Geral", d: "Foque na cadência do movimento e na técnica correta para prevenir lesões!" }
-    };
-
     let atual = JSON.parse(localStorage.getItem('treino_v13')) || [];
     let hist = JSON.parse(localStorage.getItem('hist_v13')) || [];
-    let fichas = JSON.parse(localStorage.getItem('fichas_v13')) || [];
 
-    let chartInstance = null;
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.getElementById('btn-' + tabId).classList.add('active');
-        if(tabId === 'grafico') { popularSelectExercicios(); atualizarInterfaceGrafico(); }
-        if(tabId === 'fichas') renderFichas();
-        if(tabId === 'treino') renderAtalhosFicha();
-    }
-
-    function popularSelectExercicios() {
-        const select = document.getElementById('selectExGrafico');
+    // Função que faz o App "Aprender" com o seu histórico
+    function atualizarSugestoes() {
+        const datalist = document.getElementById('listaAprendida');
         const exerciciosUnicos = new Set();
-        hist.forEach(treino => treino.itens.forEach(item => exerciciosUnicos.add(item.ex)));
-        select.innerHTML = Array.from(exerciciosUnicos).sort().map(ex => `<option value="${ex}">${ex}</option>`).join('');
-    }
+        
+        // Percorre o histórico e adiciona nomes à lista sem repetir
+        hist.forEach(treino => {
+            treino.itens.forEach(item => exerciciosUnicos.add(item.ex));
+        });
 
-    function atualizarInterfaceGrafico() {
-        const tipo = document.getElementById('tipoGrafico').value;
-        document.getElementById('containerFiltroEx').style.display = tipo === 'carga' ? 'block' : 'none';
-        document.getElementById('totalCalsLabel').style.display = tipo === 'carga' ? 'none' : 'block';
-        renderGrafico();
+        datalist.innerHTML = Array.from(exerciciosUnicos)
+            .sort()
+            .map(nome => `<option value="${nome}">`)
+            .join('');
     }
 
     function buscarUltimoPeso(nomeEx) {
         if (!nomeEx || nomeEx.length < 3) { document.getElementById('referenciaPeso').innerHTML = ""; return; }
-        let encontrado = null;
-        for (let treino of hist) {
-            encontrado = treino.itens.find(i => i.ex.toLowerCase() === nomeEx.toLowerCase());
-            if (encontrado && encontrado.p) break;
+        const treinoAnterior = hist.find(t => t.itens.some(i => i.ex.toLowerCase() === nomeEx.toLowerCase()));
+        if (treinoAnterior) {
+            const item = treinoAnterior.itens.find(i => i.ex.toLowerCase() === nomeEx.toLowerCase());
+            document.getElementById('referenciaPeso').innerHTML = `<span class="last-weight-info">💡 Última vez: ${item.p}kg (${item.s}x${item.r})</span>`;
         }
-        document.getElementById('referenciaPeso').innerHTML = encontrado ? `<span class="last-weight-info">💡 Última vez: ${encontrado.p}kg (${encontrado.s}x${encontrado.r})</span>` : "";
-    }
-
-    function carregarFichaNoTreino(idFicha) {
-        const ficha = fichas.find(f => f.id === idFicha);
-        if(ficha) {
-            ficha.txt.split('\n').forEach(linha => {
-                const nomeEx = linha.trim().replace(/^\d+\.\s*/, '');
-                if(nomeEx) {
-                    let info = bancoDicas["padrao"];
-                    for (let chave in bancoDicas) { if (nomeEx.toLowerCase().includes(chave)) { info = bancoDicas[chave]; break; } }
-                    let pesoRef = "";
-                    for (let treino of hist) {
-                        let ref = treino.itens.find(i => i.ex.toLowerCase() === nomeEx.toLowerCase());
-                        if (ref) { pesoRef = ref.p; break; }
-                    }
-                    atual.push({ ex: nomeEx, s: '', r: '', p: pesoRef, grupo: info.g });
-                }
-            });
-            localStorage.setItem('treino_v13', JSON.stringify(atual)); render();
-        }
-    }
-
-    function renderAtalhosFicha() {
-        document.getElementById('botoesAtalhoFicha').innerHTML = fichas.map(f => `<button class="btn-load" onclick="carregarFichaNoTreino(${f.id})">${f.tit}</button>`).join('');
     }
 
     function adicionar() {
         const ex = document.getElementById('ex').value;
         const s = document.getElementById('sets').value, r = document.getElementById('reps').value, p = document.getElementById('peso').value;
-        if (ex) {
-            let info = bancoDicas["padrao"];
-            for (let chave in bancoDicas) { if (ex.toLowerCase().includes(chave)) { info = bancoDicas[chave]; break; } }
-            atual.push({ ex, s, r, p, grupo: info.g });
-            localStorage.setItem('treino_v13', JSON.stringify(atual)); render();
+        if (ex && s && r) {
+            atual.push({ ex, s, r, p });
+            localStorage.setItem('treino_v13', JSON.stringify(atual));
+            render();
             ["ex","sets","reps","peso"].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('referenciaPeso').innerHTML = "";
         }
     }
 
     function render() {
         document.getElementById('listaAtual').innerHTML = atual.map((i, idx) => `
             <li>
-                <div class="ex-row">
-                    <div><strong>${i.ex}</strong><br><span class="tag-musculo">${i.grupo}</span></div>
-                    <div>
-                        <button class="btn-dica" onclick="abrirDica('${i.ex}')">IA Dica</button>
-                        <span onclick="removerEx(${idx})" style="color:var(--danger); margin-left:15px; font-weight:bold; cursor:pointer">✕</span>
-                    </div>
+                <div style="display:flex; justify-content:space-between">
+                    <strong>${i.ex}</strong>
+                    <span onclick="remover(${idx})" style="color:var(--danger)">✕</span>
                 </div>
-                <div class="input-grid" style="margin-top:10px;">
-                    <input type="number" value="${i.s}" placeholder="Sér." onchange="atual[${idx}].s=this.value; localStorage.setItem('treino_v13', JSON.stringify(atual))">
-                    <input type="number" value="${i.r}" placeholder="Rep." onchange="atual[${idx}].r=this.value; localStorage.setItem('treino_v13', JSON.stringify(atual))">
-                    <input type="number" value="${i.p}" placeholder="Kg" onchange="atual[${idx}].p=this.value; localStorage.setItem('treino_v13', JSON.stringify(atual))">
-                </div>
+                <div style="font-size:12px; color:#8E8E93; margin-top:4px">${i.s}x${i.r} - ${i.p}kg</div>
             </li>`).join('');
     }
 
-    function abrirDica(nomeEx) {
-        const termo = nomeEx.toLowerCase().trim();
-        let dica = bancoDicas["padrao"].d;
-        for (let chave in bancoDicas) { if (termo.includes(chave)) { dica = bancoDicas[chave].d; break; } }
-        document.getElementById('modalTitulo').innerText = nomeEx;
-        document.getElementById('modalInstrucao').innerText = dica;
-        document.getElementById('modalDica').style.display = 'flex';
+    function remover(idx) {
+        atual.splice(idx, 1);
+        localStorage.setItem('treino_v13', JSON.stringify(atual));
+        render();
     }
-
-    function fecharDica() { document.getElementById('modalDica').style.display = 'none'; }
-    function removerEx(idx) { atual.splice(idx,1); localStorage.setItem('treino_v13', JSON.stringify(atual)); render(); }
 
     async function finalizar() {
         const cM = parseFloat(document.getElementById('calMusculo').value) || 0;
         const cC = parseFloat(document.getElementById('calCardio').value) || 0;
-        
         if (atual.length === 0 && (cM + cC) === 0) return;
 
-        const novoTreino = { 
-            id: Date.now(), 
-            data: new Date().toLocaleDateString('pt-BR'), 
-            calTotal: cM + cC, 
-            calM: cM, 
-            calC: cC, 
-            itens: [...atual] 
-        };
-
-        hist.unshift(novoTreino);
+        const novo = { id: Date.now(), data: new Date().toLocaleDateString('pt-BR'), calTotal: cM + cC, calM: cM, calC: cC, itens: [...atual] };
+        hist.unshift(novo);
         localStorage.setItem('hist_v13', JSON.stringify(hist));
 
         try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(novoTreino)
-            });
-            alert("Sincronizado com a Nuvem Google!");
+            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(novo) });
+            alert("Sucesso! Sincronizado com a nuvem.");
         } catch (e) {
-            alert("Salvo apenas no celular (sem conexão).");
+            alert("Salvo localmente.");
         }
 
-        atual = []; 
-        localStorage.setItem('treino_v13', JSON.stringify(atual));
+        atual = [];
+        localStorage.setItem('treino_v13', "[]");
+        renderHist();
+        atualizarSugestoes(); // Atualiza a lista com o que acabou de aprender
+        render();
         ["calMusculo", "calCardio", "cardioTempo"].forEach(id => document.getElementById(id).value = '');
-        render(); renderHist();
     }
 
     function renderHist() {
-        document.getElementById('historico').innerHTML = hist.map(h => `
+        document.getElementById('historico').innerHTML = hist.slice(0, 5).map(h => `
             <div class="historico-item">
-                <span class="delete-btn" onclick="apagarHist(${h.id})">🗑️</span>
-                <div style="color:#8E8E93; font-weight:bold; font-size:12px; margin-bottom:5px">📅 ${h.data}</div>
-                
-                <div style="font-size:11px; margin-bottom:8px; display: flex; gap: 10px;">
-                    <span style="color:#AEAEB2">🏋️ M: <span style="color:var(--text)">${h.calM || 0}</span></span>
-                    <span style="color:#AEAEB2">🏃 C: <span style="color:var(--text)">${h.calC || 0}</span></span>
-                    <span style="color:var(--success)">🔥 Total: ${h.calTotal} kcal</span>
-                </div>
-
-                <div style="font-size:13px; border-top: 1px solid #2C2C2E; pt-5px; margin-top:5px; padding-top:5px;">
-                    ${h.itens.map(i => i.ex).join(', ') || 'Somente Cardio'}
-                </div>
+                <div style="font-size:12px; color:#8E8E93">📅 ${h.data} | 🔥 ${h.calTotal}kcal</div>
+                <div style="font-size:13px; margin-top:5px">${h.itens.map(i => i.ex).join(', ')}</div>
             </div>`).join('');
     }
 
-    function apagarHist(id) { if(confirm("Apagar?")) { hist = hist.filter(h => h.id !== id); localStorage.setItem('hist_v13', JSON.stringify(hist)); renderHist(); } }
-
-    function salvarFicha() {
-        const tit = document.getElementById('tituloFicha').value;
-        const txt = document.getElementById('textoFicha').value;
-        if(tit && txt) {
-            fichas.push({ id: Date.now(), tit, txt }); localStorage.setItem('fichas_v13', JSON.stringify(fichas));
-            document.getElementById('tituloFicha').value = ''; document.getElementById('textoFicha').value = '';
-            renderFichas(); renderAtalhosFicha();
-        }
+    function switchTab(id) {
+        document.querySelectorAll('.content').forEach(c => c.classList.toggle('active', c.id === id));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'btn-'+id));
     }
 
-    function renderFichas() {
-        document.getElementById('listaFichas').innerHTML = fichas.map(f => `
-            <div class="ficha-item">
-                <div style="display:flex; justify-content:space-between">
-                    <strong style="color:var(--primary)">${f.tit}</strong>
-                    <span onclick="apagarFicha(${f.id})" style="color:var(--danger); cursor:pointer">🗑️</span>
-                </div>
-                <div style="white-space: pre-wrap; font-size:13px; color:#AEAEB2; margin-top:8px">${f.txt}</div>
-            </div>`).join('');
-    }
-
-    function apagarFicha(id) { if(confirm("Apagar ficha?")) { fichas = fichas.filter(f => f.id !== id); localStorage.setItem('fichas_v13', JSON.stringify(fichas)); renderFichas(); renderAtalhosFicha(); } }
-
-    function exportarDados() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ hist, fichas }));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "backup_nikho.json");
-        document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove();
-    }
-
-    function importarDados(input) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            try {
-                const dados = JSON.parse(reader.result);
-                if (dados.hist) { hist = dados.hist; localStorage.setItem('hist_v13', JSON.stringify(hist)); }
-                if (dados.fichas) { fichas = dados.fichas; localStorage.setItem('fichas_v13', JSON.stringify(fichas)); }
-                alert("Importado!"); location.reload();
-            } catch(e) { alert("Erro ao ler arquivo."); }
-        };
-        reader.readAsText(input.files[0]);
-    }
-
-    function renderGrafico() {
-        const ctx = document.getElementById('meuGrafico').getContext('2d');
-        const tipo = document.getElementById('tipoGrafico').value;
-        let labels = [], dataPoints = [], datasetLabel = "";
-
-        if (tipo === 'calorias') {
-            const dados = [...hist].slice(0, 10).reverse();
-            labels = dados.map(h => h.data.substring(0,5)); dataPoints = dados.map(h => h.calTotal); datasetLabel = "Calorias";
-            document.getElementById('totalCalsLabel').innerText = `Total Geral: ${hist.reduce((s, h) => s + h.calTotal, 0).toFixed(0)} kcal`;
-        } else {
-            const exSelecionado = document.getElementById('selectExGrafico').value;
-            const dadosEx = [];
-            [...hist].reverse().forEach(treino => {
-                const item = treino.itens.find(i => i.ex === exSelecionado);
-                if (item && item.p) dadosEx.push({ data: treino.data.substring(0,5), peso: parseFloat(item.p) });
-            });
-            labels = dadosEx.map(d => d.data); dataPoints = dadosEx.map(d => d.peso); datasetLabel = `Carga em ${exSelecionado} (kg)`;
-        }
-
-        if(chartInstance) chartInstance.destroy();
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{ label: datasetLabel, data: dataPoints, borderColor: '#0A84FF', backgroundColor: 'rgba(10, 132, 255, 0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 5 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: tipo === 'carga' } }, scales: { y: { beginAtZero: false, grid: { color: '#333' }, ticks: { color: '#8E8E93' } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } } }
-        });
-    }
-
-    renderAtalhosFicha(); render(); renderHist();
+    // Inicialização
+    render();
+    renderHist();
+    atualizarSugestoes();
 </script>
-
 </body>
 </html>
