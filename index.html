@@ -170,16 +170,12 @@
         "triceps": { g: "Tríceps", d: "Mantenha o cotovelo parado e estenda o braço completamente." },
         "elevacao": { g: "Ombros", d: "Suba os braços até a linha dos ombros, cotovelos levemente flexionados." },
         "leg": { g: "Pernas", d: "Não tire a lombar do banco e não estenda totalmente o joelho." },
-        "padrao": { g: "Geral", d: "Foque na cadência do movimento e na técnica correta!" }
+        "padrao": { g: "Geral", d: "Foque na cadência do movimento e na técnica correta para prevenir lesões!" }
     };
 
     let atual = JSON.parse(localStorage.getItem('treino_v13')) || [];
     let hist = JSON.parse(localStorage.getItem('hist_v13')) || [];
-    let fichas = JSON.parse(localStorage.getItem('fichas_v13')) || [
-        { id: 1, tit: "Treino A", txt: "Supino Reto\nSupino Inclinado\nCrucifixo\nTríceps Pulley\nTríceps Corda" },
-        { id: 2, tit: "Treino B", txt: "Puxada Alta\nRemada Curvada\nPull-down\nRosca Direta\nRosca Martelo" },
-        { id: 3, tit: "Treino C", txt: "Agachamento\nLeg Press\nExtensora\nElevação Lateral\nDesenvolvimento" }
-    ];
+    let fichas = JSON.parse(localStorage.getItem('fichas_v13')) || [];
 
     let chartInstance = null;
 
@@ -284,7 +280,6 @@
     function fecharDica() { document.getElementById('modalDica').style.display = 'none'; }
     function removerEx(idx) { atual.splice(idx,1); localStorage.setItem('treino_v13', JSON.stringify(atual)); render(); }
 
-    // --- FINALIZAR COM SINCRONIZAÇÃO NUVEM ---
     async function finalizar() {
         const cM = parseFloat(document.getElementById('calMusculo').value) || 0;
         const cC = parseFloat(document.getElementById('calCardio').value) || 0;
@@ -300,11 +295,9 @@
             itens: [...atual] 
         };
 
-        // Salva Local
         hist.unshift(novoTreino);
         localStorage.setItem('hist_v13', JSON.stringify(hist));
 
-        // Sincroniza Google Sheets
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
@@ -326,8 +319,17 @@
         document.getElementById('historico').innerHTML = hist.map(h => `
             <div class="historico-item">
                 <span class="delete-btn" onclick="apagarHist(${h.id})">🗑️</span>
-                <div style="color:#8E8E93; font-weight:bold; font-size:12px; margin-bottom:5px">📅 ${h.data} | 🔥 ${h.calTotal} kcal</div>
-                <div style="font-size:13px;">${h.itens.map(i => i.ex).join(', ') || 'Cardio'}</div>
+                <div style="color:#8E8E93; font-weight:bold; font-size:12px; margin-bottom:5px">📅 ${h.data}</div>
+                
+                <div style="font-size:11px; margin-bottom:8px; display: flex; gap: 10px;">
+                    <span style="color:#AEAEB2">🏋️ M: <span style="color:var(--text)">${h.calM || 0}</span></span>
+                    <span style="color:#AEAEB2">🏃 C: <span style="color:var(--text)">${h.calC || 0}</span></span>
+                    <span style="color:var(--success)">🔥 Total: ${h.calTotal} kcal</span>
+                </div>
+
+                <div style="font-size:13px; border-top: 1px solid #2C2C2E; pt-5px; margin-top:5px; padding-top:5px;">
+                    ${h.itens.map(i => i.ex).join(', ') || 'Somente Cardio'}
+                </div>
             </div>`).join('');
     }
 
