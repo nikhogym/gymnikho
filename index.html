@@ -80,10 +80,27 @@
             </div>
 
             <div class="input-grid">
-                <input type="text" id="ex" placeholder="Nome" oninput="buscarUltimoPeso(this.value)">
+                <input type="text" id="ex" placeholder="Nome" list="listaExercicios" oninput="buscarUltimoPeso(this.value)">
                 <input type="number" id="sets" placeholder="Sér.">
                 <input type="number" id="reps" placeholder="Rep.">
                 <input type="number" id="peso" placeholder="Kg">
+                
+                <datalist id="listaExercicios">
+                    <option value="Supino Reto">
+                    <option value="Supino Inclinado">
+                    <option value="Agachamento Livre">
+                    <option value="Leg Press">
+                    <option value="Puxada Alta">
+                    <option value="Remada Curvada">
+                    <option value="Rosca Direta">
+                    <option value="Rosca Martelo">
+                    <option value="Tríceps Pulley">
+                    <option value="Elevação Lateral">
+                    <option value="Desenvolvimento">
+                    <option value="Levantamento Terra">
+                    <option value="Cadeira Extensora">
+                    <option value="Cadeira Flexora">
+                </datalist>
             </div>
             <div id="referenciaPeso" style="margin-bottom: 10px;"></div>
             
