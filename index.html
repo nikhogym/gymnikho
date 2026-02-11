@@ -6,7 +6,7 @@
     <title>Treino Nikho Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #0A84FF; --success: #30D158; --danger: #FF453A; --bg: #000000; --card: #1C1C1E; --text: #FFFFFF; --input-bg: #2C2C2E; }
+        :root { --primary: #0A84FF; --success: #30D158; --danger: #FF453A; --bg: #000000; --card: #1C1C1E; --text: #FFFFFF; --input-bg: #2C2C2E; --cloud: #5AC8FA; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; padding-top: 80px; }
         
@@ -28,9 +28,12 @@
         .input-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         input, select, textarea { background: var(--input-bg); border: 1px solid #3A3A3C; border-radius: 12px; color: white; padding: 12px; font-size: 14px; width: 100%; outline: none; }
         
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 16px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 16px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; margin-bottom: 8px; }
+        .btn:active { opacity: 0.7; transform: scale(0.98); }
         .btn-add { background: var(--primary); color: white; }
-        .btn-finish { background: var(--success); color: white; margin-top: 15px; }
+        .btn-finish { background: var(--success); color: white; }
+        .btn-sync { background: var(--cloud); color: white; }
+        
         .btn-load { background: #3A3A3C; color: var(--primary); padding: 8px; font-size: 12px; margin-top: 10px; border-radius: 10px; width: auto; display: inline-block; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 10px; font-size: 13px; border-radius: 12px; flex: 1; margin-top: 10px; }
 
@@ -127,7 +130,9 @@
                 <span class="cal-label">🔥 Calorias do Cardio</span>
                 <input type="number" id="calCardio" placeholder="0 kcal">
             </div>
-            <button class="btn btn-finish" onclick="finalizar()">Finalizar e Sincronizar</button>
+            
+            <button class="btn btn-finish" onclick="finalizarLocal()">✅ Finalizar Registro</button>
+            <button class="btn btn-sync" onclick="sincronizarComGoogle()">☁️ Sincronizar com Nuvem</button>
         </div>
 
         <h3 style="margin-left: 10px;">📜 Histórico</h3>
@@ -175,7 +180,6 @@
 </div>
 
 <script>
-    // --- CONFIGURAÇÃO GOOGLE SHEETS ---
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjhUFfkvnlz-AnpSmgA6ZXeASbeBm_7nHl6cFDuKTuIWVx_Iv1Aq8pb_M8RcxMa0ly/exec";
 
     const bancoDicas = {
@@ -297,7 +301,9 @@
     function fecharDica() { document.getElementById('modalDica').style.display = 'none'; }
     function removerEx(idx) { atual.splice(idx,1); localStorage.setItem('treino_v13', JSON.stringify(atual)); render(); }
 
-    async function finalizar() {
+    // --- FUNÇÕES SEPARADAS ---
+
+    function finalizarLocal() {
         const cM = parseFloat(document.getElementById('calMusculo').value) || 0;
         const cC = parseFloat(document.getElementById('calCardio').value) || 0;
         
@@ -315,21 +321,34 @@
         hist.unshift(novoTreino);
         localStorage.setItem('hist_v13', JSON.stringify(hist));
 
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(novoTreino)
-            });
-            alert("Sincronizado com a Nuvem Google!");
-        } catch (e) {
-            alert("Salvo apenas no celular (sem conexão).");
-        }
-
+        // Limpa apenas os campos de entrada, mantém o histórico atualizado na tela
         atual = []; 
         localStorage.setItem('treino_v13', JSON.stringify(atual));
         ["calMusculo", "calCardio", "cardioTempo"].forEach(id => document.getElementById(id).value = '');
-        render(); renderHist();
+        render(); 
+        renderHist();
+        alert("Treino registrado localmente com sucesso! ✅");
+    }
+
+    async function sincronizarComGoogle() {
+        if (hist.length === 0) {
+            alert("Não há histórico para sincronizar.");
+            return;
+        }
+
+        // Pega o treino mais recente (o primeiro do array)
+        const ultimoTreino = hist[0];
+
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(ultimoTreino)
+            });
+            alert("Sincronizado com a Nuvem Google! ☁️✅");
+        } catch (e) {
+            alert("Erro na conexão. Verifique a internet.");
+        }
     }
 
     function renderHist() {
