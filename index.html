@@ -131,6 +131,22 @@
         .avatar-name { font-size: 10px; font-weight: bold; color: var(--text); display: block; }
         .avatar-lvl { font-size: 8px; color: var(--muted); text-transform: uppercase; }
 
+        /* --- BADGES --- */
+        .badges-section { margin-top: 25px; }
+        .badge-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+        .badge-card {
+            aspect-ratio: 1;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            position: relative;
+            cursor: pointer;
+        }
+        .badge-card.locked { opacity: 0.2; filter: grayscale(1); }
+        .badge-card.unlocked { border-color: var(--gold); box-shadow: 0 0 5px rgba(255, 215, 0, 0.2); }
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--card); padding: 25px; border-radius: 20px; width: 85%; max-width: 300px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); position: relative; }
         .modal-avatar { font-size: 60px; margin-bottom: 10px; animation: pulseAvatar 2s infinite; display: inline-block; }
@@ -249,6 +265,13 @@
             </div>
         </div>
         <div class="collection-grid" id="avatarGrid"></div>
+        
+        <div class="badges-section">
+            <div style="font-size: 12px; color: var(--muted); font-weight:bold; margin-bottom: 5px; text-transform:uppercase;">Conquistas & Badges (100)</div>
+            <div class="card">
+                <div id="badgeGrid" class="badge-grid"></div>
+            </div>
+        </div>
         <div style="height: 60px;"></div>
     </div>
 
@@ -258,7 +281,15 @@
             <select id="selectExGrafico" onchange="renderizarGraficoEvolucao()"></select>
             <div style="height: 180px;"><canvas id="chartCarga"></canvas></div>
         </div>
-        <button class="btn-outline" style="width:100%" onclick="exportarDados()">💾 Backup Dados</button>
+        
+        <div class="card" style="border-color: var(--gold);">
+            <div style="font-weight:bold; margin-bottom:10px; color: var(--gold);">💾 Segurança de Dados</div>
+            <p style="font-size: 11px; color: var(--muted);">Salve seu progresso ou restaure um arquivo anterior.</p>
+            <button class="btn-outline" style="width:100%; margin-bottom: 10px;" onclick="exportarDados()">💾 Salvar Backup (Download)</button>
+            
+            <input type="file" id="restoreInput" style="display:none" accept=".json" onchange="restaurarBackup(this)">
+            <button class="btn" style="width:100%; background: var(--input-bg); border: 1px dashed var(--muted);" onclick="document.getElementById('restoreInput').click()">📂 Restaurar Backup</button>
+        </div>
     </div>
 
     <div id="fichas" class="content">
@@ -324,7 +355,43 @@
         'ecosystem': { name: 'Digital', avatars: [ { l:1, i:'⚫', n:'Pixel', d:'Um ponto na tela.' }, { l:3, i:'👾', n:'Glitch', d:'Erro no sistema.' }, { l:5, i:'💾', n:'8-Bit', d:'A era de ouro.' }, { l:8, i:'🕹️', n:'Joystick', d:'Controle total.' }, { l:12, i:'🌐', n:'Web', d:'Conectado a tudo.' }, { l:16, i:'🛡️', n:'Firewall', d:'Defesa impenetrável.' }, { l:20, i:'💻', n:'Hacker', d:'Quebrando códigos.' }, { l:25, i:'🕶️', n:'VR', d:'Realidade simulada.' }, { l:30, i:'🧠', n:'Rede Neural', d:'Aprendizado profundo.' }, { l:40, i:'🌌', n:'Metaverso', d:'Realidade infinita.' } ] }
     };
 
+    const BADGE_DATABASE = {
+        'apple': [
+            {i:'🍏', n:'Newton', d:'Começou a entender a gravidade.'}, {i:'🖱️', n:'Click', d:'Primeira ação executada.'}, {i:'📂', n:'Organizer', d:'Vida organizada.'}, {i:'💿', n:'Legacy', d:'Clássico nunca morre.'}, {i:'📡', n:'Wi-Fi', d:'Sinal forte.'}, {i:'⌚', n:'Wearable', d:'Monitorando tudo.'}, {i:'🎨', n:'Design', d:'Estilo impecável.'}, {i:'🔐', n:'Secure', d:'Privacidade máxima.'}, {i:'🦄', n:'Unicorn', d:'Valor de mercado bilionário.'}, {i:'♾️', n:'Loop', d:'Foco infinito.'}
+        ],
+        'performance': [
+            {i:'👟', n:'Start', d:'Deu o primeiro passo.'}, {i:'⏱️', n:'Pacer', d:'Ritmo constante.'}, {i:'🔥', n:'Burn', d:'Queimando tudo.'}, {i:'💪', n:'Strong', d:'Sentindo a força.'}, {i:'🏋️', n:'Lifter', d:'Peso pesado.'}, {i:'🚴', n:'Cyclist', d:'Pedalando longe.'}, {i:'🤸', n:'Flex', d:'Mobilidade em dia.'}, {i:'🥗', n:'Clean', d:'Dieta limpa.'}, {i:'💤', n:'Recover', d:'Sono anabólico.'}, {i:'🏆', n:'Elite', d:'Performance de topo.'}
+        ],
+        'liquid': [
+            {i:'💧', n:'H2O', d:'Hidratação básica.'}, {i:'🏊', n:'Swimmer', d:'Nade, não afunde.'}, {i:'🌊', n:'Wave', d:'Seguindo o fluxo.'}, {i:'🏄', n:'Surfer', d:'Equilíbrio nas ondas.'}, {i:'🛶', n:'Row', d:'Remando contra a maré.'}, {i:'⚓', n:'Anchor', d:'Firmeza mental.'}, {i:'🧊', n:'Ice', d:'Sangue frio.'}, {i:'🚢', n:'Ship', d:'Carga pesada.'}, {i:'🏝️', n:'Island', d:'Seu refúgio.'}, {i:'🌀', n:'Storm', d:'Caos controlado.'}
+        ],
+        'apex': [
+            {i:'🥚', n:'Nest', d:'Protegendo o ganho.'}, {i:'🐾', n:'Track', d:'Rastreando a meta.'}, {i:'🦷', n:'Bite', d:'Agarrou a chance.'}, {i:'👁️', n:'Hunter', d:'Olhos no prêmio.'}, {i:'🍖', n:'Carnivore', d:'Proteína pura.'}, {i:'🩸', n:'Blood', d:'Esforço vital.'}, {i:'🦴', n:'Bone', d:'Estrutura sólida.'}, {i:'🦁', n:'Roar', d:'Voz de comando.'}, {i:'👑', n:'King', d:'Topo da cadeia.'}, {i:'⚔️', n:'Survival', d:'Apenas os fortes.'}
+        ],
+        'nebula': [
+            {i:'🌑', n:'Void', d:'Começando do nada.'}, {i:'✨', n:'Spark', d:'Pequeno brilho.'}, {i:'🔭', n:'Vision', d:'Olhando longe.'}, {i:'🛸', n:'UFO', d:'Movimento estranho.'}, {i:'👽', n:'Alien', d:'Treino de outro mundo.'}, {i:'👩‍🚀', n:'Astro', d:'Sem gravidade.'}, {i:'🪐', n:'Ring', d:'Compromisso orbital.'}, {i:'🌠', n:'Wish', d:'Sonho realizado.'}, {i:'🌞', n:'Sol', d:'Centro das atenções.'}, {i:'🌌', n:'Verse', d:'Expansão total.'}
+        ],
+        'volt': [
+            {i:'🔌', n:'Plug', d:'Ligado na tomada.'}, {i:'🔋', n:'Cell', d:'Armazenando carga.'}, {i:'⚡', n:'Zap', d:'Choque de realidade.'}, {i:'💡', n:'Bright', d:'Ideia genial.'}, {i:'🏭', n:'Power', d:'Força bruta.'}, {i:'🚧', n:'Danger', d:'Alta tensão.'}, {i:'🌩️', n:'Storm', d:'Energia instável.'}, {i:'🧲', n:'Magnet', d:'Atraindo sucesso.'}, {i:'🔦', n:'Beam', d:'Foco laser.'}, {i:'☢️', n:'Nuke', d:'Explosivo.'}
+        ],
+        'titanium': [
+            {i:'🔩', n:'Bolt', d:'Tudo ajustado.'}, {i:'🔧', n:'Fix', d:'Corrigindo falhas.'}, {i:'🔨', n:'Hammer', d:'Batendo forte.'}, {i:'🏗️', n:'Build', d:'Construindo o shape.'}, {i:'📐', n:'Plan', d:'Engenharia corporal.'}, {i:'🦾', n:'Arm', d:'Braço de ferro.'}, {i:'🦿', n:'Leg', d:'Base de aço.'}, {i:'🛡️', n:'Shield', d:'Defesa impenetrável.'}, {i:'⚙️', n:'Gear', d:'Sistema rodando.'}, {i:'🚀', n:'Boost', d:'Propulsão extra.'}
+        ],
+        'vitality': [
+            {i:'🌱', n:'Grow', d:'Crescimento natural.'}, {i:'🍂', n:'Cycle', d:'Respeite as estações.'}, {i:'🍄', n:'Fungi', d:'Rede oculta.'}, {i:'🌵', n:'Dry', d:'Resiliência na seca.'}, {i:'🌴', n:'Tall', d:'Sombra e água fresca.'}, {i:'🪵', n:'Log', d:'Histórico sólido.'}, {i:'🌸', n:'Bloom', d:'Auge da forma.'}, {i:'🏞️', n:'Valley', d:'Jornada tranquila.'}, {i:'⛰️', n:'Peak', d:'Topo do mundo.'}, {i:'🌎', n:'Mother', d:'Origem de tudo.'}
+        ],
+        'aurora': [
+            {i:'❄️', n:'Chill', d:'Cabeça fria.'}, {i:'🥶', n:'Cold', d:'Treino gelado.'}, {i:'🌨️', n:'Snow', d:'Acumulando ganhos.'}, {i:'🌬️', n:'Wind', d:'Sopro de mudança.'}, {i:'🌫️', n:'Fog', d:'Mistério no ar.'}, {i:'🎿', n:'Ski', d:'Deslizando fácil.'}, {i:'🏔️', n:'Everest', d:'Desafio supremo.'}, {i:'🧥', n:'Warm', d:'Aquecimento feito.'}, {i:'🍵', n:'Tea', d:'Calma interior.'}, {i:'🧊', n:'Solid', d:'Inquebrável.'}
+        ],
+        'ecosystem': [
+            {i:'🕹️', n:'Player', d:'Press Start.'}, {i:'👾', n:'Bug', d:'Não é falha, é feature.'}, {i:'💾', n:'Save', d:'Progresso salvo.'}, {i:'🎲', n:'RNG', d:'Sorte no drop.'}, {i:'🎮', n:'Control', d:'Domine o jogo.'}, {i:'🏆', n:'Achievement', d:'Conquista desbloqueada.'}, {i:'📺', n:'Screen', d:'Tempo de tela.'}, {i:'🖱️', n:'Macro', d:'Automação.'}, {i:'🧬', n:'Code', d:'DNA digital.'}, {i:'🚀', n:'Launch', d:'Lançamento.'}
+        ]
+    };
+
     let user = JSON.parse(localStorage.getItem('user_nikho')) || { level: 1, xp: 0, nextXp: 500, points: 0, streak: 0, badges: [] };
+    // Compatibilidade para usuários antigos que não tinham badges array
+    if(!user.badges) user.badges = [];
+
     let hist = JSON.parse(localStorage.getItem('hist_nikho')) || [];
     let sessao = [];
     let currentTheme = localStorage.getItem('theme_nikho') || 'apple';
@@ -367,6 +434,53 @@
             el.innerHTML = `<span class="avatar-icon">${av.i}</span><span class="avatar-name">${unlocked ? av.n : '???'}</span><span class="avatar-lvl">LVL ${av.l}</span>`;
             grid.appendChild(el);
         });
+        renderBadges();
+    }
+
+    function renderBadges() {
+        const badgeGrid = document.getElementById('badgeGrid');
+        badgeGrid.innerHTML = '';
+        
+        // Pega badges do tema atual ou mistura? Vamos mostrar todos do tema atual primeiro
+        const badgesList = BADGE_DATABASE[currentTheme] || BADGE_DATABASE['apple'];
+        
+        badgesList.forEach(b => {
+            const hasBadge = user.badges.includes(b.n); // Verifica pelo nome único
+            const el = document.createElement('div');
+            el.className = `badge-card ${hasBadge ? 'unlocked' : 'locked'}`;
+            el.innerHTML = b.i;
+            el.onclick = () => {
+                document.getElementById('avatarModal').style.display = 'flex';
+                document.getElementById('modalIcon').innerText = b.i;
+                document.getElementById('modalName').innerText = hasBadge ? b.n : 'Bloqueado';
+                document.getElementById('modalLvl').innerText = hasBadge ? 'CONQUISTA DESBLOQUEADA' : 'CONQUISTA BLOQUEADA';
+                document.getElementById('modalLvl').style.color = hasBadge ? 'var(--gold)' : 'var(--muted)';
+                document.getElementById('modalDesc').innerText = hasBadge ? b.d : "Continue treinando e completando desafios para desbloquear aleatoriamente.";
+            };
+            badgeGrid.appendChild(el);
+        });
+    }
+
+    function tentaDesbloquearConquista() {
+        // Chance de 30% de ganhar uma badge ao completar algo
+        if (Math.random() > 0.3) return;
+
+        const themeKeys = Object.keys(BADGE_DATABASE);
+        const randomTheme = themeKeys[Math.floor(Math.random() * themeKeys.length)];
+        const themeBadges = BADGE_DATABASE[randomTheme];
+        
+        // Filtra badges que o user ainda não tem
+        const unowned = themeBadges.filter(b => !user.badges.includes(b.n));
+        
+        if (unowned.length > 0) {
+            const newBadge = unowned[Math.floor(Math.random() * unowned.length)];
+            user.badges.push(newBadge.n);
+            localStorage.setItem('user_nikho', JSON.stringify(user));
+            
+            // Alerta visual
+            alert(`🏆 NOVA CONQUISTA DESBLOQUEADA!\n\n${newBadge.i} ${newBadge.n}\n"${newBadge.d}"`);
+            confetti({particleCount: 200, spread: 100, origin: { y: 0.6 }});
+        }
     }
 
     function showModal(av, unlocked) {
@@ -455,6 +569,10 @@
             confetti({particleCount: 150, spread: 80});
         }
         localStorage.setItem('user_nikho', JSON.stringify(user));
+        
+        // Tenta desbloquear badge aleatória
+        tentaDesbloquearConquista();
+
         sessao = [];
         voltarParaDashboard();
         updateGamificationUI();
@@ -513,10 +631,43 @@
     }
 
     function exportarDados() {
+        const dataStr = JSON.stringify({
+            hist: hist, 
+            user: user, 
+            fichas: JSON.parse(localStorage.getItem('fichas_nikho')),
+            theme: localStorage.getItem('theme_nikho')
+        });
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([JSON.stringify({hist, user, fichas: JSON.parse(localStorage.getItem('fichas_nikho'))})], {type: 'application/json'}));
-        a.download = `nikho_rpg_backup.json`;
+        a.href = url;
+        a.download = `nikho_backup_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function restaurarBackup(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                if(data.user) localStorage.setItem('user_nikho', JSON.stringify(data.user));
+                if(data.hist) localStorage.setItem('hist_nikho', JSON.stringify(data.hist));
+                if(data.fichas) localStorage.setItem('fichas_nikho', JSON.stringify(data.fichas));
+                if(data.theme) localStorage.setItem('theme_nikho', data.theme);
+
+                alert("Backup restaurado com sucesso! O app será recarregado.");
+                location.reload();
+            } catch (err) {
+                alert("Erro ao ler arquivo de backup. Verifique se é um JSON válido.");
+            }
+        };
+        reader.readAsText(file);
     }
 
     window.onload = () => {
@@ -548,6 +699,7 @@
             localStorage.setItem('user_nikho', JSON.stringify(user));
             updateGamificationUI();
             generateQuests();
+            tentaDesbloquearConquista(); // Chance de badge
             confetti({particleCount: 50, spread: 60, origin: { y: 0.7 }});
         }
     }
