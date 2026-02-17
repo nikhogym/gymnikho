@@ -3,449 +3,554 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Treino Nikho Pro</title>
+    <title>Nikho Gym RPG</title>
+    
+    <link rel="apple-touch-icon" href="https://img.icons8.com/neon/150/dumbbell.png">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/neon/150/dumbbell.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
-        :root { --primary: #0A84FF; --success: #30D158; --danger: #FF453A; --bg: #000000; --card: #1C1C1E; --text: #FFFFFF; --input-bg: #2C2C2E; --cloud: #5AC8FA; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; padding-top: 80px; }
-        
-        .tabs { 
-            display: flex; gap: 8px; position: fixed; top: 0; left: 0; right: 0; 
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            padding: 15px 10px; z-index: 1000; border-bottom: 1px solid #3A3A3C;
+        /* --- ARQUITETURA DE TEMAS --- */
+        :root {
+            /* Padrão: Apple Neon */
+            --bg: #000000; --card: #1C1C1E; --input-bg: #2C2C2E; --text: #FFFFFF;
+            --muted: #8E8E93; --border: #3A3A3C; --primary: #0A84FF; --cardio: #FC4C02;
+            --outras: #30D158; --xp: #BF5AF2; --gold: #FFD700;
+            --radius-card: 20px; --radius-btn: 16px;
         }
-        .tab-btn { flex: 1; padding: 10px 5px; border: none; border-radius: 12px; background: var(--input-bg); color: #8E8E93; font-weight: bold; font-size: 12px; }
-        .tab-btn.active { background: var(--primary); color: white; }
 
-        .container { width: 100%; max-width: 450px; margin: auto; }
-        .content { display: none; width: 100%; }
+        /* Variações de Tema */
+        [data-theme="performance"] { --bg: #0D1117; --card: #161B22; --input-bg: #21262d; --text: #c9d1d9; --muted: #8b949e; --border: #30363d; --primary: #2ea043; --cardio: #da3633; --outras: #2ea043; --xp: #1f6feb; --gold: #e3b341; }
+        [data-theme="ecosystem"] { --bg: #000000; --card: #111111; --input-bg: #222; --text: #eee; --muted: #666; --border: #333; --primary: #00FF94; --cardio: #FF005C; --outras: #00FF94; --xp: #9D00FF; --gold: #FFD600; }
+        [data-theme="nebula"] { --bg: #1a0b2e; --card: rgba(67, 26, 131, 0.3); --input-bg: rgba(0,0,0,0.4); --text: #e0d4fc; --muted: #76659c; --border: rgba(112, 82, 255, 0.3); --primary: #7052ff; --cardio: #ff2a6d; --outras: #05d9e8; --xp: #d23eff; --gold: #f9d71c; }
+        [data-theme="titanium"] { --bg: #18181b; --card: #27272a; --input-bg: #3f3f46; --text: #f4f4f5; --muted: #a1a1aa; --border: #52525b; --primary: #f59e0b; --cardio: #ef4444; --outras: #10b981; --xp: #3b82f6; --gold: #fcd34d; }
+        [data-theme="vitality"] { --bg: #1c1917; --card: #292524; --input-bg: #44403c; --text: #e7e5e4; --muted: #a8a29e; --border: #57534e; --primary: #84cc16; --cardio: #f97316; --outras: #22c55e; --xp: #a855f7; --gold: #facc15; }
+        [data-theme="aurora"] { --bg: #0f172a; --card: rgba(30, 41, 59, 0.7); --input-bg: rgba(51, 65, 85, 0.5); --text: #f1f5f9; --muted: #94a3b8; --border: #334155; --primary: #38bdf8; --cardio: #f472b6; --outras: #2dd4bf; --xp: #818cf8; --gold: #fde047; }
+        [data-theme="volt"] { --bg: #050505; --card: #0a0a0a; --input-bg: #1a1a1a; --text: #ffffff; --muted: #555; --border: #333; --primary: #ccff00; --cardio: #ff003c; --outras: #00f0ff; --xp: #b900ff; --gold: #ffff00; --radius-card: 4px; --radius-btn: 2px; }
+        [data-theme="apex"] { --bg: #1a0505; --card: #2d0a0a; --input-bg: #450a0a; --text: #ffe4e4; --muted: #b98585; --border: #7f1d1d; --primary: #ff0000; --cardio: #ff6b6b; --outras: #ff0000; --xp: #ff8c00; --gold: #ffcc00; }
+        [data-theme="liquid"] { --bg: #001219; --card: rgba(0, 95, 115, 0.2); --input-bg: rgba(10, 147, 150, 0.2); --text: #e0fbfc; --muted: #94d2bd; --border: rgba(10, 147, 150, 0.4); --primary: #00e0ff; --cardio: #ee9b00; --outras: #94d2bd; --xp: #0a9396; --gold: #e9d8a6; }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background: var(--bg); color: var(--text); 
+            margin: 0; padding: 10px; padding-top: 50px; padding-bottom: 90px;
+            transition: all 0.5s ease;
+        }
+
+        [data-theme="liquid"] body { background: radial-gradient(circle at bottom, #003049, #000000); background-attachment: fixed; }
+        [data-theme="nebula"] body { background: radial-gradient(circle at top right, #3c1361, #000000); background-attachment: fixed; }
+
+        /* --- GAMIFICATION HEADER --- */
+        .gamification-bar {
+            background: var(--card);
+            padding: 12px;
+            border-radius: var(--radius-card);
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .avatar-container {
+            width: 55px; height: 55px;
+            background: var(--input-bg);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulseAvatar 3s infinite;
+        }
+
+        .user-stats { flex: 1; }
+        .xp-bar-bg { width: 100%; height: 8px; background: var(--input-bg); border-radius: 4px; margin-top: 5px; overflow: hidden; }
+        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--xp), var(--primary)); width: 0%; transition: width 1s ease; }
+
+        /* --- DASHBOARD COMPACTO --- */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .stat-card { background: var(--card); padding: 10px; border-radius: var(--radius-card); text-align: center; border: 1px solid var(--border); }
+        .stat-val { font-size: 16px; font-weight: 900; color: var(--text); }
+        .stat-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- BOTÃO DESTAQUE (AJUSTE DE BRILHO) --- */
+        .big-start-btn {
+            width: 100%; padding: 25px; 
+            background: var(--primary); 
+            color: var(--bg);
+            border: none; border-radius: var(--radius-card); 
+            font-size: 22px; font-weight: 900; 
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4); /* Sombra mais escura */
+            cursor: pointer; margin: 10px 0; 
+            position: relative; overflow: hidden; 
+            transition: transform 0.2s;
+            animation: breathe 2.5s infinite ease-in-out;
+            z-index: 10;
+            filter: brightness(0.9); /* Diminui brilho geral */
+        }
+        .big-start-btn:active { transform: scale(0.96); }
+        .big-start-btn small { display: block; font-size: 10px; opacity: 0.8; font-weight: normal; margin-top: 4px; }
+
+        /* --- UI ELEMENTS --- */
+        .card { background: var(--card); padding: 15px; border-radius: var(--radius-card); margin-bottom: 10px; border: 1px solid var(--border); }
+        input, select, textarea { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; width: 100%; margin-bottom: 8px; font-size: 14px; outline: none; }
+        
+        .btn { width: 100%; padding: 14px; border: none; border-radius: var(--radius-btn); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
+        .btn-finish { background: var(--outras); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 8px; border-radius: 8px; }
+
+        .quest-item { background: var(--input-bg); padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; font-size: 12px; border-left: 3px solid var(--muted); transition: 0.3s; }
+        .quest-item.completed { opacity: 0.5; border-color: var(--outras); text-decoration: line-through; }
+
+        /* --- COLEÇÃO --- */
+        .collection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .avatar-card { 
+            background: var(--input-bg); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 10px; 
+            text-align: center; 
+            position: relative;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .avatar-card.locked { opacity: 0.5; filter: grayscale(1); border-style: dashed; }
+        .avatar-card.locked::after { content: '🔒'; position: absolute; top:5px; right: 5px; font-size: 10px; }
+        .avatar-card.active { border: 2px solid var(--primary); box-shadow: 0 0 10px var(--primary); background: rgba(255,255,255,0.05); }
+        
+        .avatar-icon { font-size: 30px; margin-bottom: 5px; display: block; }
+        .avatar-name { font-size: 10px; font-weight: bold; color: var(--text); display: block; }
+        .avatar-lvl { font-size: 8px; color: var(--muted); text-transform: uppercase; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card); padding: 25px; border-radius: 20px; width: 85%; max-width: 300px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); position: relative; }
+        .modal-avatar { font-size: 60px; margin-bottom: 10px; animation: pulseAvatar 2s infinite; display: inline-block; }
+
+        /* --- ANIMATIONS (GLOW SUAVIZADO) --- */
+        @keyframes breathe { 
+            0% { box-shadow: 0 0 5px rgba(0,0,0,0.4); } 
+            50% { box-shadow: 0 0 15px var(--primary); } 
+            100% { box-shadow: 0 0 5px rgba(0,0,0,0.4); } 
+        }
+        @keyframes pulseAvatar { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .content { display: none; opacity: 0; animation: fadeIn 0.3s forwards; }
         .content.active { display: block; }
+        @keyframes fadeIn { to { opacity: 1; } }
 
-        .card { background: var(--card); padding: 20px; border-radius: 22px; margin-bottom: 15px; border: 1px solid #2C2C2E; }
-        .section-title { font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: bold; }
-        
-        .input-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        input, select, textarea { background: var(--input-bg); border: 1px solid #3A3A3C; border-radius: 12px; color: white; padding: 12px; font-size: 14px; width: 100%; outline: none; }
-        
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 16px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; margin-bottom: 8px; }
-        .btn:active { opacity: 0.7; transform: scale(0.98); }
-        .btn-add { background: var(--primary); color: white; }
-        .btn-finish { background: var(--success); color: white; }
-        .btn-sync { background: var(--cloud); color: white; }
-        
-        .btn-load { background: #3A3A3C; color: var(--primary); padding: 8px; font-size: 12px; margin-top: 10px; border-radius: 10px; width: auto; display: inline-block; }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 10px; font-size: 13px; border-radius: 12px; flex: 1; margin-top: 10px; }
+        /* --- TABS --- */
+        #workout-area { display: none; }
+        #workout-area.visible { display: block; }
+        .tabs { display: flex; gap: 10px; position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 94%; max-width: 400px; background: rgba(20,20,20,0.95); backdrop-filter: blur(10px); padding: 8px; z-index: 2000; border-radius: 25px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; color: var(--muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.2s; }
+        .tab-btn.active { color: var(--primary); background: var(--input-bg); border-radius: 15px; }
+        .tab-btn span { font-size: 16px; }
 
-        ul { list-style: none; padding: 0; margin-top: 15px; }
-        li { background: var(--input-bg); padding: 15px; border-radius: 15px; margin-bottom: 10px; border-left: 5px solid var(--primary); }
-        .ex-row { display: flex; justify-content: space-between; align-items: center; }
-        .btn-dica { background: #3A3A3C; color: var(--primary); border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; }
-        
-        .tag-musculo { font-size: 10px; background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block; text-transform: uppercase; }
-        .last-weight-info { font-size: 11px; color: var(--success); margin-top: 4px; display: block; font-weight: bold; }
-
-        #modalDica { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: var(--card); width: 100%; max-width: 350px; border-radius: 25px; padding: 25px; text-align: center; border: 1px solid #3A3A3C; }
-        
-        .cal-box { background: #2C2C2E; padding: 12px; border-radius: 12px; margin-top: 10px; border: 1px solid #3A3A3C; }
-        .cal-label { font-size: 12px; color: #8E8E93; margin-bottom: 5px; display: block; }
-
-        .historico-item { background: var(--card); border: 1px solid #3A3A3C; padding: 15px; border-radius: 18px; margin-bottom: 10px; position: relative; }
-        .delete-btn { color: var(--danger); font-size: 18px; position: absolute; right: 15px; top: 12px; cursor: pointer; }
-        
-        .ficha-item { background: #2C2C2E; padding: 15px; border-radius: 15px; margin-bottom: 10px; }
+        .theme-switcher { position: fixed; top: 10px; right: 10px; z-index: 3000; background: var(--input-bg); color: var(--primary); border: 1px solid var(--border); padding: 5px 10px; border-radius: 15px; font-size: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="modalDica" onclick="fecharDica()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 id="modalTitulo" style="margin-top:0; color:var(--primary)">Dica da IA</h3>
-        <p id="modalInstrucao" style="color: #FFFFFF; font-size: 15px; line-height: 1.6; text-align: left;"></p>
-        <button class="btn btn-add" onclick="fecharDica()">Entendido</button>
-    </div>
-</div>
+<button class="theme-switcher" onclick="toggleTheme()">🎨 MUDAR TEMA</button>
 
-<div class="container">
-    <div class="tabs">
-        <button id="btn-treino" class="tab-btn active" onclick="switchTab('treino')">💪 Treinar</button>
-        <button id="btn-fichas" class="tab-btn" onclick="switchTab('fichas')">📋 Fichas</button>
-        <button id="btn-grafico" class="tab-btn" onclick="switchTab('grafico')">📈 Evolução</button>
-    </div>
-
-    <div id="treino" class="content active">
-        <div class="card">
-            <div class="section-title">🏋️ Musculação</div>
-            <div style="margin-bottom: 15px;">
-                <span style="font-size: 12px; color: #8E8E93;">Carregar da Ficha:</span><br>
-                <div id="botoesAtalhoFicha" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
-            </div>
-
-            <div class="input-grid">
-                <input type="text" id="ex" placeholder="Nome" list="listaExercicios" oninput="buscarUltimoPeso(this.value)">
-                <input type="number" id="sets" placeholder="Sér.">
-                <input type="number" id="reps" placeholder="Rep.">
-                <input type="number" id="peso" placeholder="Kg">
-                
-                <datalist id="listaExercicios">
-                    <option value="Supino Reto">
-                    <option value="Supino Inclinado">
-                    <option value="Agachamento Livre">
-                    <option value="Leg Press">
-                    <option value="Puxada Alta">
-                    <option value="Remada Curvada">
-                    <option value="Rosca Direta">
-                    <option value="Rosca Martelo">
-                    <option value="Tríceps Pulley">
-                    <option value="Elevação Lateral">
-                    <option value="Desenvolvimento">
-                    <option value="Levantamento Terra">
-                    <option value="Cadeira Extensora">
-                    <option value="Cadeira Flexora">
-                </datalist>
-            </div>
-            <div id="referenciaPeso" style="margin-bottom: 10px;"></div>
+<div class="container" style="max-width: 450px; margin: auto;">
+    
+    <div id="treinar" class="content active">
+        <div id="dashboard-header">
             
-            <button class="btn btn-add" onclick="adicionar()">Adicionar Exercício</button>
-            <div class="cal-box">
-                <span class="cal-label">🔥 Calorias da Musculação</span>
-                <input type="number" id="calMusculo" placeholder="0 kcal">
+            <div class="gamification-bar" onclick="switchTab('colecao')">
+                <div class="avatar-container" id="userAvatar">🥚</div>
+                <div class="user-stats">
+                    <div style="display:flex; justify-content:space-between; font-size: 13px; font-weight: bold;">
+                        <span id="userLevelDisplay">Nível 1</span>
+                        <span style="color:var(--xp); font-size:10px;">XP</span>
+                    </div>
+                    <div class="xp-bar-bg">
+                        <div class="xp-bar-fill" id="xpBar"></div>
+                    </div>
+                    <div style="font-size: 10px; color: var(--muted); margin-top: 3px; text-align: right;" id="xpText">0 / 1000</div>
+                </div>
             </div>
-            <ul id="listaAtual"></ul>
+
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-val" id="streakDisplay">0</div>
+                    <div class="stat-lbl">Dias Seguidos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" style="color:var(--gold)" id="pointsDisplay">0</div>
+                    <div class="stat-lbl">Pontos</div>
+                </div>
+            </div>
+
+            <button id="btnStart" class="big-start-btn" onclick="iniciarTreinoUI()">
+                ⚡ INICIAR TREINO
+                <small>Toque para começar</small>
+            </button>
+
+            <div class="card" style="margin-top: 15px; margin-bottom: 10px;">
+                <div style="font-size: 11px; color:var(--muted); font-weight:bold; margin-bottom:8px; text-transform:uppercase;">Missões do Dia</div>
+                <div id="dailyQuestsList"></div>
+            </div>
+
+            <div style="margin: 0 0 20px 0; text-align: center;">
+                <div style="height: 40px; width: 100%; position: relative;">
+                    <canvas id="miniSparkline"></canvas>
+                </div>
+                <div style="font-size: 10px; color: var(--muted); margin-top: 5px;">Atividade Recente</div>
+            </div>
         </div>
 
-        <div class="card">
-            <div class="section-title">🏃 Cardio</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <select id="cardioTipo" style="flex: 2;">
-                    <option value="Esteira">Esteira</option>
-                    <option value="Bicicleta">Bicicleta</option>
-                    <option value="Elíptico">Elíptico</option>
-                    <option value="Corda">Corda</option>
+        <div id="workout-area">
+            <button class="btn-outline" style="width:100%; margin-bottom:10px; color:var(--text);" onclick="voltarParaDashboard()">⬅ Cancelar / Voltar</button>
+
+            <div class="card">
+                <div style="color: var(--cardio); font-weight:bold; margin-bottom:8px;">🏃 Cardio</div>
+                <select id="storyMode" style="margin-bottom:5px;">
+                    <option value="none">Modo Normal</option>
+                    <option value="story">Modo História (Ganho de XP extra)</option>
                 </select>
-                <input type="number" id="cardioTempo" placeholder="Min" style="flex: 1;">
+                <input type="number" id="cC" placeholder="Calorias Cardio">
             </div>
-            <div class="cal-box">
-                <span class="cal-label">🔥 Calorias do Cardio</span>
-                <input type="number" id="calCardio" placeholder="0 kcal">
-            </div>
-            
-            <button class="btn btn-finish" onclick="finalizarLocal()">✅ Finalizar Registro</button>
-            <button class="btn btn-sync" onclick="sincronizarComGoogle()">☁️ Sincronizar com Nuvem</button>
-        </div>
 
-        <h3 style="margin-left: 10px;">📜 Histórico</h3>
-        <div id="historico"></div>
+            <div class="card">
+                <div style="font-weight:bold; margin-bottom:8px;">🏋️ Musculação</div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="exNome" placeholder="Ex: Supino" oninput="buscarReferencia(this.value)">
+                    <button class="btn" style="width: 50px; background: var(--primary); color: var(--bg); margin:0;" onclick="addEx()">+</button>
+                </div>
+                <div id="referenciaPeso" style="font-size: 11px; color: var(--primary); margin: 5px 0;"></div>
+                <div id="listaTreinoAtivo"></div>
+            </div>
+
+            <div class="card">
+                <div style="color: var(--outras); font-weight:bold; margin-bottom:8px;">✅ Finalizar</div>
+                <input type="number" id="cM" placeholder="Calorias Musculação (Estimada)">
+                <button class="btn btn-finish" onclick="enviarParaPlanilha()">CONCLUIR TREINO</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="colecao" class="content">
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 12px; color: var(--muted); margin-bottom: 5px;">TEMA ATUAL</div>
+            <h2 id="collectionThemeTitle" style="margin: 0; color: var(--primary);">Apple Neon</h2>
+            <p style="font-size: 11px; color: var(--muted);">Suba de nível para desbloquear novas formas!</p>
+            <div class="xp-bar-bg" style="margin: 10px 0;">
+                <div class="xp-bar-fill" id="collectionXpBar"></div>
+            </div>
+        </div>
+        <div class="collection-grid" id="avatarGrid"></div>
+        <div style="height: 60px;"></div>
+    </div>
+
+    <div id="evolucao" class="content">
+        <div class="card">
+            <div style="font-weight:bold; margin-bottom:10px;">📈 Carga Máxima</div>
+            <select id="selectExGrafico" onchange="renderizarGraficoEvolucao()"></select>
+            <div style="height: 180px;"><canvas id="chartCarga"></canvas></div>
+        </div>
+        <button class="btn-outline" style="width:100%" onclick="exportarDados()">💾 Backup Dados</button>
     </div>
 
     <div id="fichas" class="content">
         <div class="card">
-            <div class="section-title">📝 Nova Ficha</div>
-            <input type="text" id="tituloFicha" placeholder="Ex: Treino A" style="margin-bottom: 10px;">
-            <textarea id="textoFicha" placeholder="DICA: Coloque um exercício por linha." rows="4"></textarea>
-            <button class="btn btn-add" onclick="salvarFicha()">Salvar Ficha</button>
+            <div style="font-weight:bold; margin-bottom:10px;">Criar Ficha</div>
+            <input type="text" id="titFicha" placeholder="Título">
+            <textarea id="txtFicha" rows="4" placeholder="Exercícios..."></textarea>
+            <button class="btn btn-finish" onclick="salvarFicha()">Salvar</button>
         </div>
         <div id="listaFichas"></div>
     </div>
 
-    <div id="grafico" class="content">
+    <div id="calendario" class="content">
         <div class="card">
-            <div class="section-title">📊 Evolução</div>
-            <select id="tipoGrafico" onchange="atualizarInterfaceGrafico()" style="margin-bottom: 10px;">
-                <option value="calorias">🔥 Calorias Totais</option>
-                <option value="carga">🏋️ Carga por Exercício</option>
-            </select>
-            
-            <div id="containerFiltroEx" style="display:none; margin-bottom: 15px;">
-                <span style="font-size: 12px; color: #8E8E93;">Escolha o Exercício:</span>
-                <select id="selectExGrafico" onchange="renderGrafico()"></select>
-            </div>
-
-            <div id="totalCalsLabel" style="text-align:center; color:var(--success); font-weight:bold; margin-bottom:15px;">Total Geral: 0 kcal</div>
-            <div style="height: 300px; width: 100%;">
-                <canvas id="meuGrafico"></canvas>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="section-title">💾 Backup Local</div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-outline" onclick="exportarDados()">📤 Exportar</button>
-                <button class="btn-outline" onclick="document.getElementById('importFile').click()">📥 Importar</button>
-                <input type="file" id="importFile" style="display:none" onchange="importarDados(this)">
-            </div>
+            <div id="mesAnoAtual" style="text-align:center; font-weight:bold; margin-bottom:10px;"></div>
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;" id="calBody"></div>
         </div>
     </div>
 </div>
 
-<script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjhUFfkvnlz-AnpSmgA6ZXeASbeBm_7nHl6cFDuKTuIWVx_Iv1Aq8pb_M8RcxMa0ly/exec";
+<div class="modal-overlay" id="avatarModal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-avatar" id="modalIcon">🥚</div>
+        <h2 id="modalName" style="margin:0; color:var(--primary)">Nome</h2>
+        <div id="modalLvl" style="font-size:10px; color:var(--gold); font-weight:bold; margin:5px 0;">DESBLOQUEIA NO NÍVEL X</div>
+        <p id="modalDesc" style="font-size:13px; color:var(--muted); line-height:1.4;">Descrição</p>
+        <button class="btn" style="margin-top:15px; background: var(--input-bg);" onclick="closeModal()">Fechar</button>
+    </div>
+</div>
 
-    const bancoDicas = {
-        "supino": { g: "Peitoral", d: "Mantenha o peito estufado e as escápulas presas no banco." },
-        "agachamento": { g: "Pernas/Glúteo", d: "Mantenha o tronco ereto e desça jogando o quadril para trás." },
-        "rosca": { g: "Bíceps", d: "Mantenha os cotovelos fixos ao lado do tronco." },
-        "terra": { g: "Costas/Pernas", d: "Mantenha a barra colada nas canelas. Coluna sempre neutra." },
-        "puxada": { g: "Costas", d: "Puxe a barra em direção ao peito, fechando as escápulas." },
-        "triceps": { g: "Tríceps", d: "Mantenha o cotovelo parado e estenda o braço completamente." },
-        "elevacao": { g: "Ombros", d: "Suba os braços até a linha dos ombros, cotovelos levemente flexionados." },
-        "leg": { g: "Pernas", d: "Não tire a lombar do banco e não estenda totalmente o joelho." },
-        "padrao": { g: "Geral", d: "Foque na cadência do movimento e na técnica correta para prevenir lesões!" }
+<div class="tabs">
+    <button id="tab-treinar" class="tab-btn active" onclick="switchTab('treinar')"><span>💪</span>Treino</button>
+    <button id="tab-colecao" class="tab-btn" onclick="switchTab('colecao')"><span>🧩</span>Coleção</button>
+    <button id="tab-fichas" class="tab-btn" onclick="switchTab('fichas')"><span>📋</span>Fichas</button>
+    <button id="tab-calendario" class="tab-btn" onclick="switchTab('calendario')"><span>📅</span>Hist.</button>
+</div>
+
+<script>
+    const MISSIONS_POOL = [
+        "Beber 3L de água", "Beber 1 copo d'água ao acordar", "Trocar refri por água", "Beber 500ml antes do almoço", "Garrafa de água sempre cheia",
+        "Comer 2 frutas", "Comer salada no almoço", "Sem açúcar adicionado hoje", "Bater a meta de proteína", "Jantar leve antes das 20h",
+        "Evitar frituras hoje", "Comer 1 porção de castanhas", "Sem fast-food hoje", "Cozinhar sua própria refeição", "Comer devagar e sem telas",
+        "Treinar 30 min", "Fazer 20 flexões", "Fazer 1 min de prancha", "Alongar por 5 min", "Caminhar 10 min pós-almoço",
+        "Subir escadas em vez de elevador", "Fazer 50 polichinelos", "Treinar perna pesado", "Fazer 15 min de cardio", "Bater 8.000 passos",
+        "Tentar um exercício novo", "Melhorar a carga em 1 exercício", "Fazer mobilidade de quadril", "Pular corda por 2 min", "Treinar até a falha em 1 série",
+        "Dormir 7h+", "Acordar sem soneca", "Arrumar a cama ao levantar", "Ler 5 páginas de um livro", "Tomar 10 min de sol",
+        "Banho gelado (opcional)", "Desconectar 30 min antes de dormir", "Organizar a mochila do treino", "Lavar a louça logo após comer", "Zero álcool hoje",
+        "Agradecer por 3 coisas", "Visualizar o shape meta", "Não reclamar por 24h", "Ouvir um podcast motivacional", "Meditar por 5 min",
+        "Escrever as metas de amanhã", "Elogiar alguém", "Sorrir no espelho", "Respirar fundo 10 vezes", "Focar no processo, não no resultado",
+        "Dobrar a meta de cardio", "Treino em jejum", "Super-série no treino", "Correr 1km extra", "Ficar 24h sem doces"
+    ];
+
+    const THEME_DATA = {
+        'apple': { name: 'Neon Tech', avatars: [ { l:1, i:'💾', n:'Disquete', d:'Memória curta, mas o começo de tudo.' }, { l:3, i:'🔋', n:'Bateria', d:'Acumulando energia para o que vem por aí.' }, { l:5, i:'📟', n:'Pager', d:'Comunicação básica estabelecida.' }, { l:8, i:'📱', n:'Smartphone', d:'Conectado e versátil.' }, { l:12, i:'💻', n:'Laptop', d:'Processamento móvel de alta performance.' }, { l:16, i:'🖥️', n:'Workstation', d:'Poder bruto estacionário.' }, { l:20, i:'📡', n:'Satélite', d:'Visão global e alcance ilimitado.' }, { l:25, i:'☁️', n:'Cloud', d:'Onipresente e intocável.' }, { l:30, i:'🤖', n:'AI Alpha', d:'Atingiu a senciência digital.' }, { l:40, i:'🦾', n:'Singularidade', d:'A fusão perfeita entre homem e máquina.' } ] },
+        'performance': { name: 'Atleta Pro', avatars: [ { l:1, i:'👟', n:'Iniciante', d:'Amarrou o tênis e saiu do sofá.' }, { l:3, i:'💧', n:'Suor', d:'Começando a entender o esforço.' }, { l:5, i:'🧴', n:'Hidratado', d:'A constância exige cuidado.' }, { l:8, i:'🧘', n:'Focado', d:'Mente e corpo em sintonia.' }, { l:12, i:'🏋️', n:'Levantador', d:'As cargas começam a subir.' }, { l:16, i:'🏃', n:'Velocista', d:'Explosão e agilidade dominadas.' }, { l:20, i:'🥇', n:'Medalhista', d:'Reconhecimento pelo esforço.' }, { l:25, i:'🏆', n:'Campeão', d:'O topo do pódio é sua casa.' }, { l:30, i:'🏟️', n:'Lenda', d:'Seu nome lota estádios.' }, { l:40, i:'👑', n:'GOAT', d:'O Maior de Todos os Tempos.' } ] },
+        'liquid': { name: 'Ocean Deep', avatars: [ { l:1, i:'💧', n:'Gota', d:'Uma pequena parte de algo maior.' }, { l:3, i:'🫧', n:'Bolha', d:'Subindo em direção à superfície.' }, { l:5, i:'🦐', n:'Plâncton', d:'A base da cadeia alimentar.' }, { l:8, i:'🦀', n:'Caranguejo', d:'Casca dura, difícil de quebrar.' }, { l:12, i:'🐠', n:'Peixe Tropical', d:'Ágil e cheio de cor.' }, { l:16, i:'🐢', n:'Tartaruga', d:'Resistência e longevidade.' }, { l:20, i:'🐬', n:'Golfinho', d:'Inteligência e velocidade.' }, { l:25, i:'🦈', n:'Tubarão', d:'O predador dos mares.' }, { l:30, i:'🐋', n:'Baleia Azul', d:'Majestade inabalável.' }, { l:40, i:'🔱', n:'Poseidon', d:'O regente dos sete mares.' } ] },
+        'apex': { name: 'Predador', avatars: [ { l:1, i:'🥚', n:'Ovo', d:'Potencial latente esperando eclodir.' }, { l:3, i:'🦎', n:'Lagarto', d:'Rápido e adaptável.' }, { l:5, i:'🐍', n:'Serpente', d:'Silencioso e letal.' }, { l:8, i:'🦅', n:'Falcão', d:'Visão aguçada, ataque preciso.' }, { l:12, i:'🐺', n:'Lobo', d:'Forte sozinho, invencível em bando.' }, { l:16, i:'🐆', n:'Leopardo', d:'Velocidade pura.' }, { l:20, i:'🦍', n:'Gorila', d:'Força bruta incontrolável.' }, { l:25, i:'🦁', n:'Rei Leão', d:'Dominância territorial absoluta.' }, { l:30, i:'🦖', n:'T-Rex', d:'O terror da pré-história.' }, { l:40, i:'🐉', n:'Dragão', d:'Poder mítico lendário.' } ] },
+        'nebula': { name: 'Cosmos', avatars: [ { l:1, i:'🌑', n:'Poeira', d:'Matéria dispersa no vácuo.' }, { l:3, i:'☄️', n:'Meteoro', d:'Ganhando velocidade e impacto.' }, { l:5, i:'🛰️', n:'Satélite', d:'Em órbita estável.' }, { l:8, i:'🚀', n:'Foguete', d:'Rompendo a atmosfera.' }, { l:12, i:'🌕', n:'Lua', d:'Iluminando a escuridão.' }, { l:16, i:'🪐', n:'Planeta', d:'Um mundo inteiro a descobrir.' }, { l:20, i:'☀️', n:'Estrela', d:'Gerando sua própria energia.' }, { l:25, i:'💥', n:'Supernova', d:'Explosão de poder cósmico.' }, { l:30, i:'🕳️', n:'Buraco Negro', d:'Gravidade infinita.' }, { l:40, i:'🌌', n:'Galáxia', d:'Um universo em si mesmo.' } ] },
+        'volt': { name: 'Alta Voltagem', avatars: [ { l:1, i:'🕯️', n:'Faísca', d:'Um pequeno brilho na escuridão.' }, { l:3, i:'💡', n:'Lâmpada', d:'Ideias brilhantes surgindo.' }, { l:5, i:'🔋', n:'Pilha', d:'Energia portátil.' }, { l:8, i:'🔌', n:'Conectado', d:'Fluxo constante de força.' }, { l:12, i:'⚡', n:'Relâmpago', d:'Rápido e impactante.' }, { l:16, i:'🔋', n:'Gerador', d:'Sustentando o sistema.' }, { l:20, i:'🏭', n:'Usina', d:'Produção em escala industrial.' }, { l:25, i:'☢️', n:'Reator', d:'Poder nuclear contido.' }, { l:30, i:'☀️', n:'Fusão Solar', d:'A fonte de energia suprema.' }, { l:40, i:'🌩️', n:'Zeus', d:'O senhor dos raios.' } ] },
+        'titanium': { name: 'Mecha', avatars: [ { l:1, i:'🔩', n:'Porca', d:'Uma peça pequena, mas essencial.' }, { l:3, i:'🔧', n:'Ferramenta', d:'Ajustando as engrenagens.' }, { l:5, i:'⚙️', n:'Engrenagem', d:'Parte do mecanismo.' }, { l:8, i:'⛓️', n:'Corrente', d:'Força de tração.' }, { l:12, i:'🏭', n:'Motor V8', d:'Combustão interna potente.' }, { l:16, i:'🚁', n:'Drone', d:'Automação aérea.' }, { l:20, i:'🦾', n:'Ciborgue', d:'Melhoria biônica.' }, { l:25, i:'🤖', n:'Android', d:'Inteligência artificial humanoide.' }, { l:30, i:'🚀', n:'Mecha', d:'Armadura de combate gigante.' }, { l:40, i:'🛸', n:'Mave Mãe', d:'Tecnologia alienígena superior.' } ] },
+        'vitality': { name: 'Gaia', avatars: [ { l:1, i:'🌰', n:'Semente', d:'Enterrada, esperando a chuva.' }, { l:3, i:'🌱', n:'Broto', d:'Rompendo a terra.' }, { l:5, i:'🌿', n:'Erva', d:'Crescimento rápido.' }, { l:8, i:'🎋', n:'Bambu', d:'Flexível e resistente.' }, { l:12, i:'🌳', n:'Carvalho', d:'Raízes profundas.' }, { l:16, i:'🦍', n:'Guardião', d:'Protetor da floresta.' }, { l:20, i:'🏞️', n:'Montanha', d:'Imóvel e eterno.' }, { l:25, i:'🌋', n:'Vulcão', d:'A fúria da terra.' }, { l:30, i:'🌍', n:'Mundo', d:'Ecossistema completo.' }, { l:40, i:'✨', n:'Espírito', d:'A alma da natureza.' } ] },
+        'aurora': { name: 'Frost', avatars: [ { l:1, i:'❄️', n:'Floco', d:'Único e frágil.' }, { l:3, i:'🧊', n:'Cubo', d:'Sólido e frio.' }, { l:5, i:'☃️', n:'Boneco', d:'Forma moldada na neve.' }, { l:8, i:'⛸️', n:'Patins', d:'Deslizando sobre problemas.' }, { l:12, i:'🐧', n:'Pinguim', d:'Resiliente ao extremo.' }, { l:16, i:'🐺', n:'Lobo Branco', d:'Caçador da tundra.' }, { l:20, i:'🐻‍❄️', n:'Urso Polar', d:'O rei do gelo.' }, { l:25, i:'🏔️', n:'Glaciar', d:'Uma força da natureza imparável.' }, { l:30, i:'🌬️', n:'Nevasca', d:'O poder da tempestade.' }, { l:40, i:'💎', n:'Zero Absoluto', d:'A perfeição cristalina.' } ] },
+        'ecosystem': { name: 'Digital', avatars: [ { l:1, i:'⚫', n:'Pixel', d:'Um ponto na tela.' }, { l:3, i:'👾', n:'Glitch', d:'Erro no sistema.' }, { l:5, i:'💾', n:'8-Bit', d:'A era de ouro.' }, { l:8, i:'🕹️', n:'Joystick', d:'Controle total.' }, { l:12, i:'🌐', n:'Web', d:'Conectado a tudo.' }, { l:16, i:'🛡️', n:'Firewall', d:'Defesa impenetrável.' }, { l:20, i:'💻', n:'Hacker', d:'Quebrando códigos.' }, { l:25, i:'🕶️', n:'VR', d:'Realidade simulada.' }, { l:30, i:'🧠', n:'Rede Neural', d:'Aprendizado profundo.' }, { l:40, i:'🌌', n:'Metaverso', d:'Realidade infinita.' } ] }
     };
 
-    let atual = JSON.parse(localStorage.getItem('treino_v13')) || [];
-    let hist = JSON.parse(localStorage.getItem('hist_v13')) || [];
-    let fichas = JSON.parse(localStorage.getItem('fichas_v13')) || [];
+    let user = JSON.parse(localStorage.getItem('user_nikho')) || { level: 1, xp: 0, nextXp: 500, points: 0, streak: 0, badges: [] };
+    let hist = JSON.parse(localStorage.getItem('hist_nikho')) || [];
+    let sessao = [];
+    let currentTheme = localStorage.getItem('theme_nikho') || 'apple';
 
-    let chartInstance = null;
+    function getThemeData() { return THEME_DATA[currentTheme] || THEME_DATA['apple']; }
 
-    function switchTab(tabId) {
-        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.getElementById('btn-' + tabId).classList.add('active');
-        if(tabId === 'grafico') { popularSelectExercicios(); atualizarInterfaceGrafico(); }
-        if(tabId === 'fichas') renderFichas();
-        if(tabId === 'treino') renderAtalhosFicha();
-    }
-
-    function popularSelectExercicios() {
-        const select = document.getElementById('selectExGrafico');
-        const exerciciosUnicos = new Set();
-        hist.forEach(treino => treino.itens.forEach(item => exerciciosUnicos.add(item.ex)));
-        select.innerHTML = Array.from(exerciciosUnicos).sort().map(ex => `<option value="${ex}">${ex}</option>`).join('');
-    }
-
-    function atualizarInterfaceGrafico() {
-        const tipo = document.getElementById('tipoGrafico').value;
-        document.getElementById('containerFiltroEx').style.display = tipo === 'carga' ? 'block' : 'none';
-        document.getElementById('totalCalsLabel').style.display = tipo === 'carga' ? 'none' : 'block';
-        renderGrafico();
-    }
-
-    function buscarUltimoPeso(nomeEx) {
-        if (!nomeEx || nomeEx.length < 3) { document.getElementById('referenciaPeso').innerHTML = ""; return; }
-        let encontrado = null;
-        for (let treino of hist) {
-            encontrado = treino.itens.find(i => i.ex.toLowerCase() === nomeEx.toLowerCase());
-            if (encontrado && encontrado.p) break;
+    function getCurrentAvatarObj() {
+        const data = getThemeData();
+        let found = data.avatars[0];
+        for (let av of data.avatars) {
+            if (user.level >= av.l) found = av;
+            else break; 
         }
-        document.getElementById('referenciaPeso').innerHTML = encontrado ? `<span class="last-weight-info">💡 Última vez: ${encontrado.p}kg (${encontrado.s}x${encontrado.r})</span>` : "";
+        return found;
     }
 
-    function carregarFichaNoTreino(idFicha) {
-        const ficha = fichas.find(f => f.id === idFicha);
-        if(ficha) {
-            ficha.txt.split('\n').forEach(linha => {
-                const nomeEx = linha.trim().replace(/^\d+\.\s*/, '');
-                if(nomeEx) {
-                    let info = bancoDicas["padrao"];
-                    for (let chave in bancoDicas) { if (nomeEx.toLowerCase().includes(chave)) { info = bancoDicas[chave]; break; } }
-                    let pesoRef = "";
-                    for (let treino of hist) {
-                        let ref = treino.itens.find(i => i.ex.toLowerCase() === nomeEx.toLowerCase());
-                        if (ref) { pesoRef = ref.p; break; }
-                    }
-                    atual.push({ ex: nomeEx, s: '', r: '', p: pesoRef, grupo: info.g });
-                }
-            });
-            localStorage.setItem('treino_v13', JSON.stringify(atual)); render();
-        }
+    function updateGamificationUI() {
+        const currentAv = getCurrentAvatarObj();
+        document.getElementById('userAvatar').innerText = currentAv.i;
+        const perc = Math.min(100, (user.xp / user.nextXp) * 100);
+        document.getElementById('xpBar').style.width = perc + '%';
+        document.getElementById('collectionXpBar').style.width = perc + '%';
+        document.getElementById('xpText').innerText = `${Math.floor(user.xp)} / ${user.nextXp}`;
+        document.getElementById('userLevelDisplay').innerText = `Nível ${user.level}`;
+        document.getElementById('streakDisplay').innerText = user.streak;
+        document.getElementById('pointsDisplay').innerText = user.points;
     }
 
-    function renderAtalhosFicha() {
-        document.getElementById('botoesAtalhoFicha').innerHTML = fichas.map(f => `<button class="btn-load" onclick="carregarFichaNoTreino(${f.id})">${f.tit}</button>`).join('');
-    }
-
-    function adicionar() {
-        const ex = document.getElementById('ex').value;
-        const s = document.getElementById('sets').value, r = document.getElementById('reps').value, p = document.getElementById('peso').value;
-        if (ex) {
-            let info = bancoDicas["padrao"];
-            for (let chave in bancoDicas) { if (ex.toLowerCase().includes(chave)) { info = bancoDicas[chave]; break; } }
-            atual.push({ ex, s, r, p, grupo: info.g });
-            localStorage.setItem('treino_v13', JSON.stringify(atual)); render();
-            ["ex","sets","reps","peso"].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('referenciaPeso').innerHTML = "";
-        }
-    }
-
-    function render() {
-        document.getElementById('listaAtual').innerHTML = atual.map((i, idx) => `
-            <li>
-                <div class="ex-row">
-                    <div><strong>${i.ex}</strong><br><span class="tag-musculo">${i.grupo}</span></div>
-                    <div>
-                        <button class="btn-dica" onclick="abrirDica('${i.ex}')">IA Dica</button>
-                        <span onclick="removerEx(${idx})" style="color:var(--danger); margin-left:15px; font-weight:bold; cursor:pointer">✕</span>
-                    </div>
-                </div>
-                <div class="input-grid" style="margin-top:10px;">
-                    <input type="number" value="${i.s}" placeholder="Sér." onchange="atual[${idx}].s=this.value; localStorage.setItem('treino_v13', JSON.stringify(atual))">
-                    <input type="number" value="${i.r}" placeholder="Rep." onchange="atual[${idx}].r=this.value; localStorage.setItem('treino_v13', JSON.stringify(atual))">
-                    <input type="number" value="${i.p}" placeholder="Kg" onchange="atual[${idx}].p=this.value; localStorage.setItem('treino_v13', JSON.stringify(atual))">
-                </div>
-            </li>`).join('');
-    }
-
-    function abrirDica(nomeEx) {
-        const termo = nomeEx.toLowerCase().trim();
-        let dica = bancoDicas["padrao"].d;
-        for (let chave in bancoDicas) { if (termo.includes(chave)) { dica = bancoDicas[chave].d; break; } }
-        document.getElementById('modalTitulo').innerText = nomeEx;
-        document.getElementById('modalInstrucao').innerText = dica;
-        document.getElementById('modalDica').style.display = 'flex';
-    }
-
-    function fecharDica() { document.getElementById('modalDica').style.display = 'none'; }
-    function removerEx(idx) { atual.splice(idx,1); localStorage.setItem('treino_v13', JSON.stringify(atual)); render(); }
-
-    // --- FUNÇÕES SEPARADAS ---
-
-    function finalizarLocal() {
-        const cM = parseFloat(document.getElementById('calMusculo').value) || 0;
-        const cC = parseFloat(document.getElementById('calCardio').value) || 0;
-        
-        if (atual.length === 0 && (cM + cC) === 0) return;
-
-        const novoTreino = { 
-            id: Date.now(), 
-            data: new Date().toLocaleDateString('pt-BR'), 
-            calTotal: cM + cC, 
-            calM: cM, 
-            calC: cC, 
-            itens: [...atual] 
-        };
-
-        hist.unshift(novoTreino);
-        localStorage.setItem('hist_v13', JSON.stringify(hist));
-
-        // Limpa apenas os campos de entrada, mantém o histórico atualizado na tela
-        atual = []; 
-        localStorage.setItem('treino_v13', JSON.stringify(atual));
-        ["calMusculo", "calCardio", "cardioTempo"].forEach(id => document.getElementById(id).value = '');
-        render(); 
-        renderHist();
-        alert("Treino registrado localmente com sucesso! ✅");
-    }
-
-    async function sincronizarComGoogle() {
-        if (hist.length === 0) {
-            alert("Não há histórico para sincronizar.");
-            return;
-        }
-
-        // Pega o treino mais recente (o primeiro do array)
-        const ultimoTreino = hist[0];
-
-        try {
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(ultimoTreino)
-            });
-            alert("Sincronizado com a Nuvem Google! ☁️✅");
-        } catch (e) {
-            alert("Erro na conexão. Verifique a internet.");
-        }
-    }
-
-    function renderHist() {
-        document.getElementById('historico').innerHTML = hist.map(h => `
-            <div class="historico-item">
-                <span class="delete-btn" onclick="apagarHist(${h.id})">🗑️</span>
-                <div style="color:#8E8E93; font-weight:bold; font-size:12px; margin-bottom:5px">📅 ${h.data}</div>
-                
-                <div style="font-size:11px; margin-bottom:8px; display: flex; gap: 10px;">
-                    <span style="color:#AEAEB2">🏋️ M: <span style="color:var(--text)">${h.calM || 0}</span></span>
-                    <span style="color:#AEAEB2">🏃 C: <span style="color:var(--text)">${h.calC || 0}</span></span>
-                    <span style="color:var(--success)">🔥 Total: ${h.calTotal} kcal</span>
-                </div>
-
-                <div style="font-size:13px; border-top: 1px solid #2C2C2E; pt-5px; margin-top:5px; padding-top:5px;">
-                    ${h.itens.map(i => i.ex).join(', ') || 'Somente Cardio'}
-                </div>
-            </div>`).join('');
-    }
-
-    function apagarHist(id) { if(confirm("Apagar?")) { hist = hist.filter(h => h.id !== id); localStorage.setItem('hist_v13', JSON.stringify(hist)); renderHist(); } }
-
-    function salvarFicha() {
-        const tit = document.getElementById('tituloFicha').value;
-        const txt = document.getElementById('textoFicha').value;
-        if(tit && txt) {
-            fichas.push({ id: Date.now(), tit, txt }); localStorage.setItem('fichas_v13', JSON.stringify(fichas));
-            document.getElementById('tituloFicha').value = ''; document.getElementById('textoFicha').value = '';
-            renderFichas(); renderAtalhosFicha();
-        }
-    }
-
-    function renderFichas() {
-        document.getElementById('listaFichas').innerHTML = fichas.map(f => `
-            <div class="ficha-item">
-                <div style="display:flex; justify-content:space-between">
-                    <strong style="color:var(--primary)">${f.tit}</strong>
-                    <span onclick="apagarFicha(${f.id})" style="color:var(--danger); cursor:pointer">🗑️</span>
-                </div>
-                <div style="white-space: pre-wrap; font-size:13px; color:#AEAEB2; margin-top:8px">${f.txt}</div>
-            </div>`).join('');
-    }
-
-    function apagarFicha(id) { if(confirm("Apagar ficha?")) { fichas = fichas.filter(f => f.id !== id); localStorage.setItem('fichas_v13', JSON.stringify(fichas)); renderFichas(); renderAtalhosFicha(); } }
-
-    function exportarDados() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ hist, fichas }));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "backup_nikho.json");
-        document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove();
-    }
-
-    function importarDados(input) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            try {
-                const dados = JSON.parse(reader.result);
-                if (dados.hist) { hist = dados.hist; localStorage.setItem('hist_v13', JSON.stringify(hist)); }
-                if (dados.fichas) { fichas = dados.fichas; localStorage.setItem('fichas_v13', JSON.stringify(fichas)); }
-                alert("Importado!"); location.reload();
-            } catch(e) { alert("Erro ao ler arquivo."); }
-        };
-        reader.readAsText(input.files[0]);
-    }
-
-    function renderGrafico() {
-        const ctx = document.getElementById('meuGrafico').getContext('2d');
-        const tipo = document.getElementById('tipoGrafico').value;
-        let labels = [], dataPoints = [], datasetLabel = "";
-
-        if (tipo === 'calorias') {
-            const dados = [...hist].slice(0, 10).reverse();
-            labels = dados.map(h => h.data.substring(0,5)); dataPoints = dados.map(h => h.calTotal); datasetLabel = "Calorias";
-            document.getElementById('totalCalsLabel').innerText = `Total Geral: ${hist.reduce((s, h) => s + h.calTotal, 0).toFixed(0)} kcal`;
-        } else {
-            const exSelecionado = document.getElementById('selectExGrafico').value;
-            const dadosEx = [];
-            [...hist].reverse().forEach(treino => {
-                const item = treino.itens.find(i => i.ex === exSelecionado);
-                if (item && item.p) dadosEx.push({ data: treino.data.substring(0,5), peso: parseFloat(item.p) });
-            });
-            labels = dadosEx.map(d => d.data); dataPoints = dadosEx.map(d => d.peso); datasetLabel = `Carga em ${exSelecionado} (kg)`;
-        }
-
-        if(chartInstance) chartInstance.destroy();
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{ label: datasetLabel, data: dataPoints, borderColor: '#0A84FF', backgroundColor: 'rgba(10, 132, 255, 0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 5 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: tipo === 'carga' } }, scales: { y: { beginAtZero: false, grid: { color: '#333' }, ticks: { color: '#8E8E93' } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } } }
+    function renderCollection() {
+        const data = getThemeData();
+        const grid = document.getElementById('avatarGrid');
+        grid.innerHTML = '';
+        document.getElementById('collectionThemeTitle').innerText = data.name;
+        data.avatars.forEach(av => {
+            const unlocked = user.level >= av.l;
+            const isCurrent = getCurrentAvatarObj().n === av.n;
+            const el = document.createElement('div');
+            el.className = `avatar-card ${unlocked ? (isCurrent ? 'active' : '') : 'locked'}`;
+            el.onclick = () => showModal(av, unlocked);
+            el.innerHTML = `<span class="avatar-icon">${av.i}</span><span class="avatar-name">${unlocked ? av.n : '???'}</span><span class="avatar-lvl">LVL ${av.l}</span>`;
+            grid.appendChild(el);
         });
     }
 
-    renderAtalhosFicha(); render(); renderHist();
-</script>
+    function showModal(av, unlocked) {
+        document.getElementById('avatarModal').style.display = 'flex';
+        document.getElementById('modalIcon').innerText = av.i;
+        document.getElementById('modalName').innerText = unlocked ? av.n : 'Bloqueado';
+        document.getElementById('modalLvl').innerText = unlocked ? `DESBLOQUEADO` : `DESBLOQUEIA NO NÍVEL ${av.l}`;
+        document.getElementById('modalLvl').style.color = unlocked ? 'var(--outras)' : 'var(--gold)';
+        document.getElementById('modalDesc').innerText = unlocked ? av.d : "Continue treinando para descobrir o que é.";
+    }
 
+    function closeModal() { document.getElementById('avatarModal').style.display = 'none'; }
+
+    function toggleTheme() {
+        const themes = ['apple', 'performance', 'liquid', 'apex', 'nebula', 'volt', 'titanium', 'vitality', 'aurora', 'ecosystem'];
+        let idx = (themes.indexOf(currentTheme) + 1) % themes.length;
+        currentTheme = themes[idx];
+        if (currentTheme === 'apple') document.body.removeAttribute('data-theme');
+        else document.body.setAttribute('data-theme', currentTheme);
+        localStorage.setItem('theme_nikho', currentTheme);
+        updateGamificationUI();
+        renderCollection();
+    }
+
+    function iniciarTreinoUI() {
+        document.getElementById('dashboard-header').style.display = 'none';
+        document.getElementById('workout-area').classList.add('visible');
+    }
+
+    function voltarParaDashboard() {
+        document.getElementById('workout-area').classList.remove('visible');
+        document.getElementById('dashboard-header').style.display = 'block';
+    }
+
+    function addEx() {
+        const n = document.getElementById('exNome').value;
+        if(n) {
+            sessao.push({ id: Date.now(), nome: n, series: [{r:'',p:''},{r:'',p:''},{r:'',p:''}] });
+            renderSessao();
+            document.getElementById('exNome').value = "";
+        }
+    }
+
+    function renderSessao() {
+        document.getElementById('listaTreinoAtivo').innerHTML = sessao.map(ex => `
+            <div style="background:var(--input-bg); padding:10px; border-radius:10px; margin-bottom:5px; border-left:3px solid var(--primary);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <strong>${ex.nome}</strong> 
+                    <span onclick="removerEx(${ex.id})" style="color:var(--cardio); font-weight:bold;">✕</span>
+                </div>
+                ${ex.series.map((s, i) => `
+                    <div style="display:grid; grid-template-columns: 15px 1fr 1fr; gap:5px; margin-bottom:5px; align-items:center;">
+                        <span style="color:var(--muted); font-size:10px;">${i+1}</span>
+                        <input type="number" placeholder="Reps" value="${s.r}" onchange="editSerie(${ex.id}, ${i}, 'r', this.value)" style="padding:8px; margin:0;">
+                        <input type="number" placeholder="Kg" value="${s.p}" onchange="editSerie(${ex.id}, ${i}, 'p', this.value)" style="padding:8px; margin:0;">
+                    </div>`).join('')}
+            </div>`).join('');
+    }
+
+    function editSerie(id, i, f, v) { sessao.find(e => e.id === id).series[i][f] = v; }
+    function removerEx(id) { sessao = sessao.filter(e => e.id !== id); renderSessao(); }
+
+    function buscarReferencia(nome) {
+        if (!nome || nome.length < 2) return;
+        const termo = nome.toLowerCase().trim();
+        const ultimo = hist.slice().reverse().find(t => (t.exercicios || []).some(e => e.nome.toLowerCase().includes(termo)));
+        if (ultimo) {
+            const exData = ultimo.exercicios.find(e => e.nome.toLowerCase().includes(termo));
+            document.getElementById('referenciaPeso').innerText = `Última: ${exData.series[0].p}kg (${exData.series[0].r} reps)`;
+        }
+    }
+
+    function enviarParaPlanilha() {
+        if(!confirm("Finalizar Treino?")) return;
+        const calTotal = Number(document.getElementById('cM').value) + Number(document.getElementById('cC').value);
+        hist.push({ id: Date.now(), data: new Date().toLocaleDateString('pt-BR'), hora: new Date().getHours(), calTotal, calC: Number(document.getElementById('cC').value), exercicios: [...sessao] });
+        localStorage.setItem('hist_nikho', JSON.stringify(hist));
+        const totalXP = 150 + Math.floor(calTotal * 0.2) + (document.getElementById('storyMode').value === 'story' ? 50 : 0);
+        user.xp += totalXP;
+        user.points += Math.floor(totalXP / 2);
+        if(user.xp >= user.nextXp) {
+            user.level++;
+            user.xp -= user.nextXp;
+            user.nextXp = Math.floor(user.nextXp * 1.3);
+            alert(`🎉 LEVEL UP! Nível ${user.level}!`);
+            confetti({particleCount: 150, spread: 80});
+        }
+        localStorage.setItem('user_nikho', JSON.stringify(user));
+        sessao = [];
+        voltarParaDashboard();
+        updateGamificationUI();
+        renderCollection();
+    }
+
+    function switchTab(aba) {
+        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(aba).classList.add('active');
+        document.getElementById('tab-' + aba).classList.add('active');
+        if(aba === 'colecao') renderCollection();
+        if(aba === 'calendario') renderCalendario();
+        if(aba === 'fichas') renderFichas();
+    }
+    
+    function salvarFicha() {
+        let f = JSON.parse(localStorage.getItem('fichas_nikho')) || [];
+        f.push({ t: document.getElementById('titFicha').value, txt: document.getElementById('txtFicha').value });
+        localStorage.setItem('fichas_nikho', JSON.stringify(f));
+        renderFichas();
+    }
+    
+    function renderFichas() {
+        let f = JSON.parse(localStorage.getItem('fichas_nikho')) || [];
+        document.getElementById('listaFichas').innerHTML = f.map(item => `<div class="card" onclick="carregarFicha('${item.txt.replace(/\n/g, '|')}')"><strong>${item.t}</strong><br><small style="color:var(--muted)">Toque para carregar</small></div>`).join('');
+    }
+    
+    function carregarFicha(txt) {
+        txt.split('|').forEach(n => { if(n.trim()) sessao.push({ id: Date.now()+Math.random(), nome: n.trim(), series: [{r:'',p:''},{r:'',p:''},{r:'',p:''}] }); });
+        renderSessao(); switchTab('treinar'); iniciarTreinoUI();
+    }
+
+    function renderCalendario() {
+        const body = document.getElementById('calBody');
+        const now = new Date();
+        document.getElementById('mesAnoAtual').innerText = now.toLocaleString('pt-BR', { month: 'long' }).toUpperCase();
+        body.innerHTML = '';
+        const days = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+        for(let d=1; d<=days; d++) {
+            const ds = `${d.toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
+            const trained = hist.find(h => h.data === ds);
+            body.innerHTML += `<div style="padding:6px; border-radius:6px; font-size:12px; background:${trained?'var(--primary)':'var(--input-bg)'}; color:${trained?'var(--bg)':'var(--muted)'};">${d}</div>`;
+        }
+    }
+    
+    function renderizarGraficoEvolucao() {
+        const n = [...new Set(hist.flatMap(t => (t.exercicios || []).map(e => e.nome)))];
+        const sel = document.getElementById('selectExGrafico');
+        if(sel.options.length === 0) sel.innerHTML = n.map(x => `<option value="${x}">${x}</option>`).join('');
+        const ex = sel.value;
+        if(!ex) return;
+        const d = hist.filter(t => (t.exercicios || []).some(e => e.nome === ex)).map(t => ({ label: t.data.split('/')[0], val: Math.max(...t.exercicios.find(e => e.nome === ex).series.map(s => parseFloat(s.p) || 0)) }));
+        if(window.chartInstance) window.chartInstance.destroy();
+        window.chartInstance = new Chart(document.getElementById('chartCarga'), { type: 'line', data: { labels: d.map(x=>x.label), datasets: [{ data: d.map(x=>x.val), borderColor: getComputedStyle(document.body).getPropertyValue('--primary'), tension: 0.3 }] }, options: { plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}},y:{grid:{color:'#333'}}} } });
+    }
+
+    function exportarDados() {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify({hist, user, fichas: JSON.parse(localStorage.getItem('fichas_nikho'))})], {type: 'application/json'}));
+        a.download = `nikho_rpg_backup.json`;
+        a.click();
+    }
+
+    window.onload = () => {
+        if(currentTheme !== 'apple') document.body.setAttribute('data-theme', currentTheme);
+        updateGamificationUI();
+        generateQuests();
+        new Chart(document.getElementById('miniSparkline').getContext('2d'), {
+            type: 'bar',
+            data: { labels: [1,2,3,4,5,6,7], datasets: [{ data: hist.slice(-7).map(h=>h.calTotal), backgroundColor: getComputedStyle(document.body).getPropertyValue('--primary') }] },
+            options: { plugins:{legend:false}, scales:{x:{display:false},y:{display:false}}, responsive:true, maintainAspectRatio:false }
+        });
+    }
+
+    function generateQuests() {
+        const today = new Date().toDateString();
+        if(!user.quests || user.quests.length === 0 || user.questsDate !== today) {
+            const shuffled = MISSIONS_POOL.sort(() => 0.5 - Math.random());
+            user.quests = shuffled.slice(0, 3).map(t => ({txt: t, xp: 50, done: false}));
+            user.questsDate = today;
+            localStorage.setItem('user_nikho', JSON.stringify(user));
+        }
+        document.getElementById('dailyQuestsList').innerHTML = user.quests.map((q, i) => `<div class="quest-item ${q.done ? 'completed' : ''}" onclick="completeQuest(${i})"><div style="width:16px; height:16px; border:1px solid var(--muted); border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px;">${q.done?'✓':''}</div><div style="flex:1;">${q.txt}</div><div style="font-weight:bold; color:var(--xp); font-size:10px;">+50 XP</div></div>`).join('');
+    }
+    
+    function completeQuest(i) {
+        if(!user.quests[i].done) {
+            user.quests[i].done = true;
+            user.xp += 50;
+            localStorage.setItem('user_nikho', JSON.stringify(user));
+            updateGamificationUI();
+            generateQuests();
+            confetti({particleCount: 50, spread: 60, origin: { y: 0.7 }});
+        }
+    }
+</script>
 </body>
 </html>
