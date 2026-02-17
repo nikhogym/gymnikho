@@ -275,23 +275,6 @@
         <div style="height: 60px;"></div>
     </div>
 
-    <div id="evolucao" class="content">
-        <div class="card">
-            <div style="font-weight:bold; margin-bottom:10px;">📈 Carga Máxima</div>
-            <select id="selectExGrafico" onchange="renderizarGraficoEvolucao()"></select>
-            <div style="height: 180px;"><canvas id="chartCarga"></canvas></div>
-        </div>
-        
-        <div class="card" style="border-color: var(--gold);">
-            <div style="font-weight:bold; margin-bottom:10px; color: var(--gold);">💾 Segurança de Dados</div>
-            <p style="font-size: 11px; color: var(--muted);">Salve seu progresso ou restaure um arquivo anterior.</p>
-            <button class="btn-outline" style="width:100%; margin-bottom: 10px;" onclick="exportarDados()">💾 Salvar Backup (Download)</button>
-            
-            <input type="file" id="restoreInput" style="display:none" accept=".json" onchange="restaurarBackup(this)">
-            <button class="btn" style="width:100%; background: var(--input-bg); border: 1px dashed var(--muted);" onclick="document.getElementById('restoreInput').click()">📂 Restaurar Backup</button>
-        </div>
-    </div>
-
     <div id="fichas" class="content">
         <div class="card">
             <div style="font-weight:bold; margin-bottom:10px;">Criar Ficha</div>
@@ -307,6 +290,22 @@
             <div id="mesAnoAtual" style="text-align:center; font-weight:bold; margin-bottom:10px;"></div>
             <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;" id="calBody"></div>
         </div>
+
+        <div class="card">
+            <div style="font-weight:bold; margin-bottom:10px;">📈 Evolução de Carga</div>
+            <select id="selectExGrafico" onchange="renderizarGraficoEvolucao()"></select>
+            <div style="height: 180px;"><canvas id="chartCarga"></canvas></div>
+        </div>
+        
+        <div class="card" style="border-color: var(--gold);">
+            <div style="font-weight:bold; margin-bottom:10px; color: var(--gold);">💾 Segurança de Dados</div>
+            <p style="font-size: 11px; color: var(--muted);">Salve seu progresso ou restaure um arquivo anterior.</p>
+            <button class="btn-outline" style="width:100%; margin-bottom: 10px;" onclick="exportarDados()">💾 Salvar Backup (Download)</button>
+            
+            <input type="file" id="restoreInput" style="display:none" accept=".json" onchange="restaurarBackup(this)">
+            <button class="btn" style="width:100%; background: var(--input-bg); border: 1px dashed var(--muted);" onclick="document.getElementById('restoreInput').click()">📂 Restaurar Backup</button>
+        </div>
+        <div style="height: 60px;"></div>
     </div>
 </div>
 
@@ -441,7 +440,7 @@
         const badgeGrid = document.getElementById('badgeGrid');
         badgeGrid.innerHTML = '';
         
-        // Pega badges do tema atual ou mistura? Vamos mostrar todos do tema atual primeiro
+        // Pega badges do tema atual
         const badgesList = BADGE_DATABASE[currentTheme] || BADGE_DATABASE['apple'];
         
         badgesList.forEach(b => {
@@ -570,7 +569,6 @@
         }
         localStorage.setItem('user_nikho', JSON.stringify(user));
         
-        // Tenta desbloquear badge aleatória
         tentaDesbloquearConquista();
 
         sessao = [];
@@ -585,7 +583,10 @@
         document.getElementById(aba).classList.add('active');
         document.getElementById('tab-' + aba).classList.add('active');
         if(aba === 'colecao') renderCollection();
-        if(aba === 'calendario') renderCalendario();
+        if(aba === 'calendario') {
+            renderCalendario();
+            renderizarGraficoEvolucao(); // Garante que o gráfico renderize ao entrar na aba
+        }
         if(aba === 'fichas') renderFichas();
     }
     
