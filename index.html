@@ -490,7 +490,6 @@
 
     function closeModal() { document.getElementById('avatarModal').style.display = 'none'; }
 
-    // --- NOVA FUNÇÃO: EXIBIR RESUMO DO DIA ---
     function verDetalhesDia(dataStr) {
         const diaTreino = hist.find(h => h.data === dataStr);
         if(!diaTreino) return;
@@ -518,8 +517,6 @@
             htmlContent += `<div style="color:var(--muted); font-style:italic;">Apenas Cardio registrado.</div>`;
         }
         
-        // Verifica se houve conquista nesse dia (Simulação visual, pois não salvamos data da badge)
-        // Mostramos apenas uma mensagem motivacional
         htmlContent += `<div style="margin-top:15px; font-size:10px; color:var(--gold); text-align:center;">🌟 Continue consistente para mais conquistas!</div>`;
         
         htmlContent += `</div>`;
@@ -547,10 +544,27 @@
         document.getElementById('dashboard-header').style.display = 'block';
     }
 
+    // --- ATUALIZADO: SMART FILL PARA EXERCÍCIOS INDIVIDUAIS ---
     function addEx() {
         const n = document.getElementById('exNome').value;
         if(n) {
-            sessao.push({ id: Date.now(), nome: n, series: [{r:'',p:''},{r:'',p:''},{r:'',p:''}] });
+            // Cria series padrão zeradas
+            let seriesToUse = [{r:'',p:''},{r:'',p:''},{r:'',p:''}];
+
+            // Tenta achar histórico
+            const lastRecord = hist.slice().reverse().find(h => 
+                h.exercicios.some(e => e.nome.toLowerCase() === n.toLowerCase().trim())
+            );
+
+            if(lastRecord) {
+                const lastEx = lastRecord.exercicios.find(e => e.nome.toLowerCase() === n.toLowerCase().trim());
+                if(lastEx && lastEx.series) {
+                    // Copia os dados do último treino (Deep copy)
+                    seriesToUse = JSON.parse(JSON.stringify(lastEx.series));
+                }
+            }
+
+            sessao.push({ id: Date.now(), nome: n, series: seriesToUse });
             renderSessao();
             document.getElementById('exNome').value = "";
         }
@@ -635,9 +649,37 @@
         document.getElementById('listaFichas').innerHTML = f.map(item => `<div class="card" onclick="carregarFicha('${item.txt.replace(/\n/g, '|')}')"><strong>${item.t}</strong><br><small style="color:var(--muted)">Toque para carregar</small></div>`).join('');
     }
     
+    // --- ATUALIZADO: SMART FILL PARA FICHAS ---
     function carregarFicha(txt) {
-        txt.split('|').forEach(n => { if(n.trim()) sessao.push({ id: Date.now()+Math.random(), nome: n.trim(), series: [{r:'',p:''},{r:'',p:''},{r:'',p:''}] }); });
-        renderSessao(); switchTab('treinar'); iniciarTreinoUI();
+        txt.split('|').forEach(n => { 
+            const cleanName = n.trim();
+            if(cleanName) {
+                // Cria series padrão zeradas
+                let seriesToUse = [{r:'',p:''},{r:'',p:''},{r:'',p:''}];
+
+                // Tenta achar histórico para este exercício específico
+                const lastRecord = hist.slice().reverse().find(h => 
+                    h.exercicios.some(e => e.nome.toLowerCase() === cleanName.toLowerCase())
+                );
+
+                if(lastRecord) {
+                    const lastEx = lastRecord.exercicios.find(e => e.nome.toLowerCase() === cleanName.toLowerCase());
+                    if(lastEx && lastEx.series) {
+                        // Copia os dados do último treino (Deep copy)
+                        seriesToUse = JSON.parse(JSON.stringify(lastEx.series));
+                    }
+                }
+
+                sessao.push({ 
+                    id: Date.now() + Math.random(), 
+                    nome: cleanName, 
+                    series: seriesToUse 
+                }); 
+            }
+        });
+        renderSessao(); 
+        switchTab('treinar'); 
+        iniciarTreinoUI();
     }
 
     function renderCalendario() {
@@ -650,7 +692,6 @@
             const ds = `${d.toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
             const trained = hist.find(h => h.data === ds);
             
-            // ADICIONADO: Evento onclick para ver detalhes
             const clickEvent = trained ? `onclick="verDetalhesDia('${ds}')"` : '';
             const cursorStyle = trained ? 'cursor:pointer;' : '';
             
@@ -686,18 +727,14 @@
         URL.revokeObjectURL(url);
     }
 
-    // --- NOVA LÓGICA DE RESTAURAÇÃO INTELIGENTE ---
     function sincronizarProgressoComHistorico() {
-        // Se o histórico existe mas o usuário está no nível 1 (ex: perda de dados de usuário), recalculamos
         if (hist.length > 0) {
             let totalXPRecalculado = 0;
             hist.forEach(h => {
                 totalXPRecalculado += 150 + Math.floor(h.calTotal * 0.2);
             });
 
-            // Se o XP recalculado for muito maior que o atual, atualizamos para não perder progresso
-            if (totalXPRecalculado > user.xp + (user.level * 500)) { // Estimativa grosseira
-                // Recalcula nível baseado em XP simples (algoritmo simplificado para recuperação)
+            if (totalXPRecalculado > user.xp + (user.level * 500)) { 
                 let tempLevel = 1;
                 let tempNextXp = 500;
                 let tempXp = totalXPRecalculado;
@@ -717,7 +754,7 @@
             }
         }
         updateGamificationUI();
-        renderCollection(); // Isso desbloqueia as skins visualmente baseado no novo nível
+        renderCollection(); 
     }
 
     function restaurarBackup(input) {
@@ -734,12 +771,11 @@
                 if(data.fichas) localStorage.setItem('fichas_nikho', JSON.stringify(data.fichas));
                 if(data.theme) localStorage.setItem('theme_nikho', data.theme);
 
-                // Atualiza variáveis em memória
                 user = data.user || user;
                 hist = data.hist || hist;
                 currentTheme = data.theme || currentTheme;
 
-                sincronizarProgressoComHistorico(); // CHAMA A SINCRONIZAÇÃO
+                sincronizarProgressoComHistorico(); 
 
                 alert("Backup restaurado com sucesso! Recompensas recalculadas.");
                 location.reload();
