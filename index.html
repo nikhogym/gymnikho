@@ -285,10 +285,10 @@
 
     <div id="fichas" class="content">
         <div class="card">
-            <div style="font-weight:bold; margin-bottom:10px;">Criar Ficha</div>
+            <div style="font-weight:bold; margin-bottom:10px;">Criar / Editar Ficha</div>
             <input type="text" id="titFicha" placeholder="Título">
             <textarea id="txtFicha" rows="4" placeholder="Exercícios..."></textarea>
-            <button class="btn btn-finish" onclick="salvarFicha()">Salvar</button>
+            <button id="btnSalvarFicha" class="btn btn-finish" onclick="salvarFicha()">Salvar Nova Ficha</button>
         </div>
         <div id="listaFichas"></div>
     </div>
@@ -371,6 +371,9 @@
     let hist = JSON.parse(localStorage.getItem('hist_nikho')) || [];
     let sessao = [];
     let currentTheme = localStorage.getItem('theme_nikho') || 'apple';
+    
+    // VARIÁVEL PARA CONTROLE DE EDIÇÃO
+    let editingFichaIndex = null;
 
     function getThemeData() { return THEME_DATA[currentTheme] || THEME_DATA['apple']; }
 
@@ -464,7 +467,6 @@
 
     function closeModal() { document.getElementById('avatarModal').style.display = 'none'; }
 
-    // --- ATUALIZADO: DETALHES COMPLETOS NO HISTÓRICO ---
     function verDetalhesDia(dataStr) {
         const diaTreino = hist.find(h => h.data === dataStr);
         if(!diaTreino) return;
@@ -481,9 +483,7 @@
         
         if (diaTreino.exercicios && diaTreino.exercicios.length > 0) {
             diaTreino.exercicios.forEach(ex => {
-                // Monta string de todas as séries
                 const seriesDet = ex.series.map(s => `${s.r}x${s.p}kg`).join(', ');
-                
                 htmlContent += `
                     <div style="background:var(--input-bg); padding:8px; border-radius:6px; margin-bottom:5px;">
                         <div style="font-weight:bold; margin-bottom:2px;">${ex.nome}</div>
@@ -493,9 +493,7 @@
         } else {
             htmlContent += `<div style="color:var(--muted); font-style:italic;">Apenas Cardio registrado.</div>`;
         }
-        
         htmlContent += `<div style="margin-top:15px; font-size:10px; color:var(--gold); text-align:center;">🌟 Continue consistente!</div>`;
-        
         htmlContent += `</div>`;
         document.getElementById('modalContentBody').innerHTML = htmlContent;
     }
@@ -515,7 +513,7 @@
         document.getElementById('dashboard-header').style.display = 'none';
         document.getElementById('workout-area').classList.add('visible');
         
-        // POPULA O DROPDOWN DE FICHAS AO INICIAR
+        // Atualiza dropdown (caso tenha editado ficha)
         const fichas = JSON.parse(localStorage.getItem('fichas_nikho')) || [];
         const select = document.getElementById('selectFichaTreino');
         if(fichas.length > 0) {
@@ -526,11 +524,9 @@
         }
     }
     
-    // NOVA FUNÇÃO PARA CARREGAR DO DROPDOWN
     function carregarFichaNoTreino(txt) {
         if(!txt) return;
         carregarFicha(txt);
-        // Reseta o select para o título
         document.getElementById('selectFichaTreino').value = "";
     }
 
@@ -579,14 +575,12 @@
     function editSerie(id, i, f, v) { sessao.find(e => e.id === id).series[i][f] = v; }
     function removerEx(id) { sessao = sessao.filter(e => e.id !== id); renderSessao(); }
 
-    // --- ATUALIZADO: DETALHES COMPLETOS NO INPUT ---
     function buscarReferencia(nome) {
         if (!nome || nome.length < 2) return;
         const termo = nome.toLowerCase().trim();
         const ultimo = hist.slice().reverse().find(t => (t.exercicios || []).some(e => e.nome.toLowerCase().includes(termo)));
         if (ultimo) {
             const exData = ultimo.exercicios.find(e => e.nome.toLowerCase().includes(termo));
-            // Monta string com todas as séries
             const details = exData.series.map((s, i) => `${i+1}ª: ${s.r}x${s.p}kg`).join(' | ');
             document.getElementById('referenciaPeso').innerText = `Última: ${details}`;
         }
@@ -630,16 +624,73 @@
         if(aba === 'fichas') renderFichas();
     }
     
+    // --- LÓGICA DE SALVAR E EDITAR ATUALIZADA ---
     function salvarFicha() {
+        let t = document.getElementById('titFicha').value;
+        let txt = document.getElementById('txtFicha').value;
+        if(!t || !txt) return alert("Preencha título e exercícios");
+
         let f = JSON.parse(localStorage.getItem('fichas_nikho')) || [];
-        f.push({ t: document.getElementById('titFicha').value, txt: document.getElementById('txtFicha').value });
+        
+        if (editingFichaIndex !== null) {
+            // Atualiza existente
+            f[editingFichaIndex] = { t, txt };
+            editingFichaIndex = null;
+            document.getElementById('btnSalvarFicha').innerText = "Salvar Nova Ficha";
+            alert("Ficha atualizada com sucesso!");
+        } else {
+            // Cria nova
+            f.push({ t, txt });
+            alert("Ficha salva!");
+        }
+        
         localStorage.setItem('fichas_nikho', JSON.stringify(f));
+        document.getElementById('titFicha').value = "";
+        document.getElementById('txtFicha').value = "";
         renderFichas();
     }
     
+    function editarFicha(i) {
+        let f = JSON.parse(localStorage.getItem('fichas_nikho')) || [];
+        if(f[i]) {
+            document.getElementById('titFicha').value = f[i].t;
+            document.getElementById('txtFicha').value = f[i].txt;
+            editingFichaIndex = i;
+            document.getElementById('btnSalvarFicha').innerText = "🔄 Atualizar Ficha";
+            // Rola para o topo para ver o form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function excluirFicha(i) {
+        if(confirm("Tem certeza que deseja excluir esta ficha?")) {
+            let f = JSON.parse(localStorage.getItem('fichas_nikho')) || [];
+            f.splice(i, 1);
+            localStorage.setItem('fichas_nikho', JSON.stringify(f));
+            // Se estava editando essa, cancela edição
+            if(editingFichaIndex === i) {
+                editingFichaIndex = null;
+                document.getElementById('titFicha').value = "";
+                document.getElementById('txtFicha').value = "";
+                document.getElementById('btnSalvarFicha').innerText = "Salvar Nova Ficha";
+            }
+            renderFichas();
+        }
+    }
+
     function renderFichas() {
         let f = JSON.parse(localStorage.getItem('fichas_nikho')) || [];
-        document.getElementById('listaFichas').innerHTML = f.map(item => `<div class="card" onclick="carregarFicha('${item.txt.replace(/\n/g, '|')}')"><strong>${item.t}</strong><br><small style="color:var(--muted)">Toque para carregar</small></div>`).join('');
+        document.getElementById('listaFichas').innerHTML = f.map((item, i) => `
+            <div class="card" style="position: relative;">
+                <div onclick="carregarFicha('${item.txt.replace(/\n/g, '|')}')">
+                    <strong>${item.t}</strong><br>
+                    <small style="color:var(--muted)">Toque para carregar</small>
+                </div>
+                <div style="position: absolute; top: 15px; right: 10px; display: flex; gap: 10px;">
+                    <span onclick="event.stopPropagation(); editarFicha(${i})" style="cursor:pointer; font-size:16px;">✏️</span>
+                    <span onclick="event.stopPropagation(); excluirFicha(${i})" style="cursor:pointer; font-size:16px;">🗑️</span>
+                </div>
+            </div>`).join('');
     }
     
     function carregarFicha(txt) {
@@ -650,24 +701,14 @@
                 const lastRecord = hist.slice().reverse().find(h => 
                     h.exercicios.some(e => e.nome.toLowerCase() === cleanName.toLowerCase())
                 );
-
                 if(lastRecord) {
                     const lastEx = lastRecord.exercicios.find(e => e.nome.toLowerCase() === cleanName.toLowerCase());
-                    if(lastEx && lastEx.series) {
-                        seriesToUse = JSON.parse(JSON.stringify(lastEx.series));
-                    }
+                    if(lastEx && lastEx.series) seriesToUse = JSON.parse(JSON.stringify(lastEx.series));
                 }
-
-                sessao.push({ 
-                    id: Date.now() + Math.random(), 
-                    nome: cleanName, 
-                    series: seriesToUse 
-                }); 
+                sessao.push({ id: Date.now() + Math.random(), nome: cleanName, series: seriesToUse }); 
             }
         });
         renderSessao(); 
-        // Se já estiver no treino (chamado pelo select), não precisa mudar tab ou iniciar UI de novo,
-        // mas se for chamado da aba Fichas, executa:
         if(!document.getElementById('workout-area').classList.contains('visible')) {
             switchTab('treinar'); 
             iniciarTreinoUI();
@@ -683,10 +724,8 @@
         for(let d=1; d<=days; d++) {
             const ds = `${d.toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
             const trained = hist.find(h => h.data === ds);
-            
             const clickEvent = trained ? `onclick="verDetalhesDia('${ds}')"` : '';
             const cursorStyle = trained ? 'cursor:pointer;' : '';
-            
             body.innerHTML += `<div ${clickEvent} style="padding:6px; border-radius:6px; font-size:12px; background:${trained?'var(--primary)':'var(--input-bg)'}; color:${trained?'var(--bg)':'var(--muted)'}; ${cursorStyle}">${d}</div>`;
         }
     }
@@ -711,7 +750,6 @@
         });
         const blob = new Blob([dataStr], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
-        
         const a = document.createElement('a');
         a.href = url;
         a.download = `nikho_backup_${new Date().toISOString().slice(0,10)}.json`;
@@ -725,18 +763,15 @@
             hist.forEach(h => {
                 totalXPRecalculado += 150 + Math.floor(h.calTotal * 0.2);
             });
-
             if (totalXPRecalculado > user.xp + (user.level * 500)) { 
                 let tempLevel = 1;
                 let tempNextXp = 500;
                 let tempXp = totalXPRecalculado;
-                
                 while (tempXp >= tempNextXp) {
                     tempXp -= tempNextXp;
                     tempLevel++;
                     tempNextXp = Math.floor(tempNextXp * 1.3);
                 }
-                
                 user.level = tempLevel;
                 user.xp = tempXp;
                 user.nextXp = tempNextXp;
@@ -752,23 +787,18 @@
     function restaurarBackup(input) {
         const file = input.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                
                 if(data.user) localStorage.setItem('user_nikho', JSON.stringify(data.user));
                 if(data.hist) localStorage.setItem('hist_nikho', JSON.stringify(data.hist));
                 if(data.fichas) localStorage.setItem('fichas_nikho', JSON.stringify(data.fichas));
                 if(data.theme) localStorage.setItem('theme_nikho', data.theme);
-
                 user = data.user || user;
                 hist = data.hist || hist;
                 currentTheme = data.theme || currentTheme;
-
                 sincronizarProgressoComHistorico(); 
-
                 alert("Backup restaurado com sucesso! Recompensas recalculadas.");
                 location.reload();
             } catch (err) {
