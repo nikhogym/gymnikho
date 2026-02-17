@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nikho Gym RPG</title>
     
-    <link rel="apple-touch-icon" href="image.png">
-    <link rel="icon" type="image/png" href="image.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/nolan/512/N.png">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/nolan/512/N.png">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -82,7 +82,7 @@
         .stat-val { font-size: 16px; font-weight: 900; color: var(--text); }
         .stat-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* --- BOTÃO DESTAQUE (AJUSTE DE BRILHO) --- */
+        /* --- BOTÃO DESTAQUE --- */
         .big-start-btn {
             width: 100%; padding: 25px; 
             background: var(--primary); 
@@ -152,7 +152,7 @@
         .modal-content { background: var(--card); padding: 25px; border-radius: 20px; width: 85%; max-width: 300px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); position: relative; max-height: 80vh; overflow-y: auto; }
         .modal-avatar { font-size: 60px; margin-bottom: 10px; animation: pulseAvatar 2s infinite; display: inline-block; }
 
-        /* --- ANIMATIONS (GLOW SUAVIZADO) --- */
+        /* --- ANIMATIONS --- */
         @keyframes breathe { 
             0% { box-shadow: 0 0 5px rgba(0,0,0,0.4); } 
             50% { box-shadow: 0 0 15px var(--primary); } 
@@ -240,6 +240,13 @@
 
             <div class="card">
                 <div style="font-weight:bold; margin-bottom:8px;">🏋️ Musculação</div>
+                
+                <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--border);">
+                    <select id="selectFichaTreino" onchange="carregarFichaNoTreino(this.value)" style="margin-bottom:0;">
+                        <option value="">📂 Carregar Ficha Salva...</option>
+                    </select>
+                </div>
+
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="exNome" placeholder="Ex: Supino" oninput="buscarReferencia(this.value)">
                     <button class="btn" style="width: 50px; background: var(--primary); color: var(--bg); margin:0;" onclick="addEx()">+</button>
@@ -358,39 +365,6 @@
         'ecosystem': { name: 'Digital', avatars: [ { l:1, i:'⚫', n:'Pixel', d:'Um ponto na tela.' }, { l:3, i:'👾', n:'Glitch', d:'Erro no sistema.' }, { l:5, i:'💾', n:'8-Bit', d:'A era de ouro.' }, { l:8, i:'🕹️', n:'Joystick', d:'Controle total.' }, { l:12, i:'🌐', n:'Web', d:'Conectado a tudo.' }, { l:16, i:'🛡️', n:'Firewall', d:'Defesa impenetrável.' }, { l:20, i:'💻', n:'Hacker', d:'Quebrando códigos.' }, { l:25, i:'🕶️', n:'VR', d:'Realidade simulada.' }, { l:30, i:'🧠', n:'Rede Neural', d:'Aprendizado profundo.' }, { l:40, i:'🌌', n:'Metaverso', d:'Realidade infinita.' } ] }
     };
 
-    const BADGE_DATABASE = {
-        'apple': [
-            {i:'🍏', n:'Newton', d:'Começou a entender a gravidade.'}, {i:'🖱️', n:'Click', d:'Primeira ação executada.'}, {i:'📂', n:'Organizer', d:'Vida organizada.'}, {i:'💿', n:'Legacy', d:'Clássico nunca morre.'}, {i:'📡', n:'Wi-Fi', d:'Sinal forte.'}, {i:'⌚', n:'Wearable', d:'Monitorando tudo.'}, {i:'🎨', n:'Design', d:'Estilo impecável.'}, {i:'🔐', n:'Secure', d:'Privacidade máxima.'}, {i:'🦄', n:'Unicorn', d:'Valor de mercado bilionário.'}, {i:'♾️', n:'Loop', d:'Foco infinito.'}
-        ],
-        'performance': [
-            {i:'👟', n:'Start', d:'Deu o primeiro passo.'}, {i:'⏱️', n:'Pacer', d:'Ritmo constante.'}, {i:'🔥', n:'Burn', d:'Queimando tudo.'}, {i:'💪', n:'Strong', d:'Sentindo a força.'}, {i:'🏋️', n:'Lifter', d:'Peso pesado.'}, {i:'🚴', n:'Cyclist', d:'Pedalando longe.'}, {i:'🤸', n:'Flex', d:'Mobilidade em dia.'}, {i:'🥗', n:'Clean', d:'Dieta limpa.'}, {i:'💤', n:'Recover', d:'Sono anabólico.'}, {i:'🏆', n:'Elite', d:'Performance de topo.'}
-        ],
-        'liquid': [
-            {i:'💧', n:'H2O', d:'Hidratação básica.'}, {i:'🏊', n:'Swimmer', d:'Nade, não afunde.'}, {i:'🌊', n:'Wave', d:'Seguindo o fluxo.'}, {i:'🏄', n:'Surfer', d:'Equilíbrio nas ondas.'}, {i:'🛶', n:'Row', d:'Remando contra a maré.'}, {i:'⚓', n:'Anchor', d:'Firmeza mental.'}, {i:'🧊', n:'Ice', d:'Sangue frio.'}, {i:'🚢', n:'Ship', d:'Carga pesada.'}, {i:'🏝️', n:'Island', d:'Seu refúgio.'}, {i:'🌀', n:'Storm', d:'Caos controlado.'}
-        ],
-        'apex': [
-            {i:'🥚', n:'Nest', d:'Protegendo o ganho.'}, {i:'🐾', n:'Track', d:'Rastreando a meta.'}, {i:'🦷', n:'Bite', d:'Agarrou a chance.'}, {i:'👁️', n:'Hunter', d:'Olhos no prêmio.'}, {i:'🍖', n:'Carnivore', d:'Proteína pura.'}, {i:'🩸', n:'Blood', d:'Esforço vital.'}, {i:'🦴', n:'Bone', d:'Estrutura sólida.'}, {i:'🦁', n:'Roar', d:'Voz de comando.'}, {i:'👑', n:'King', d:'Topo da cadeia.'}, {i:'⚔️', n:'Survival', d:'Apenas os fortes.'}
-        ],
-        'nebula': [
-            {i:'🌑', n:'Void', d:'Começando do nada.'}, {i:'✨', n:'Spark', d:'Pequeno brilho.'}, {i:'🔭', n:'Vision', d:'Olhando longe.'}, {i:'🛸', n:'UFO', d:'Movimento estranho.'}, {i:'👽', n:'Alien', d:'Treino de outro mundo.'}, {i:'👩‍🚀', n:'Astro', d:'Sem gravidade.'}, {i:'🪐', n:'Ring', d:'Compromisso orbital.'}, {i:'🌠', n:'Wish', d:'Sonho realizado.'}, {i:'🌞', n:'Sol', d:'Centro das atenções.'}, {i:'🌌', n:'Verse', d:'Expansão total.'}
-        ],
-        'volt': [
-            {i:'🔌', n:'Plug', d:'Ligado na tomada.'}, {i:'🔋', n:'Cell', d:'Armazenando carga.'}, {i:'⚡', n:'Zap', d:'Choque de realidade.'}, {i:'💡', n:'Bright', d:'Ideia genial.'}, {i:'🏭', n:'Power', d:'Força bruta.'}, {i:'🚧', n:'Danger', d:'Alta tensão.'}, {i:'🌩️', n:'Storm', d:'Energia instável.'}, {i:'🧲', n:'Magnet', d:'Atraindo sucesso.'}, {i:'🔦', n:'Beam', d:'Foco laser.'}, {i:'☢️', n:'Nuke', d:'Explosivo.'}
-        ],
-        'titanium': [
-            {i:'🔩', n:'Bolt', d:'Tudo ajustado.'}, {i:'🔧', n:'Fix', d:'Corrigindo falhas.'}, {i:'🔨', n:'Hammer', d:'Batendo forte.'}, {i:'🏗️', n:'Build', d:'Construindo o shape.'}, {i:'📐', n:'Plan', d:'Engenharia corporal.'}, {i:'🦾', n:'Arm', d:'Braço de ferro.'}, {i:'🦿', n:'Leg', d:'Base de aço.'}, {i:'🛡️', n:'Shield', d:'Defesa impenetrável.'}, {i:'⚙️', n:'Gear', d:'Sistema rodando.'}, {i:'🚀', n:'Boost', d:'Propulsão extra.'}
-        ],
-        'vitality': [
-            {i:'🌱', n:'Grow', d:'Crescimento natural.'}, {i:'🍂', n:'Cycle', d:'Respeite as estações.'}, {i:'🍄', n:'Fungi', d:'Rede oculta.'}, {i:'🌵', n:'Dry', d:'Resiliência na seca.'}, {i:'🌴', n:'Tall', d:'Sombra e água fresca.'}, {i:'🪵', n:'Log', d:'Histórico sólido.'}, {i:'🌸', n:'Bloom', d:'Auge da forma.'}, {i:'🏞️', n:'Valley', d:'Jornada tranquila.'}, {i:'⛰️', n:'Peak', d:'Topo do mundo.'}, {i:'🌎', n:'Mother', d:'Origem de tudo.'}
-        ],
-        'aurora': [
-            {i:'❄️', n:'Chill', d:'Cabeça fria.'}, {i:'🥶', n:'Cold', d:'Treino gelado.'}, {i:'🌨️', n:'Snow', d:'Acumulando ganhos.'}, {i:'🌬️', n:'Wind', d:'Sopro de mudança.'}, {i:'🌫️', n:'Fog', d:'Mistério no ar.'}, {i:'🎿', n:'Ski', d:'Deslizando fácil.'}, {i:'🏔️', n:'Everest', d:'Desafio supremo.'}, {i:'🧥', n:'Warm', d:'Aquecimento feito.'}, {i:'🍵', n:'Tea', d:'Calma interior.'}, {i:'🧊', n:'Solid', d:'Inquebrável.'}
-        ],
-        'ecosystem': [
-            {i:'🕹️', n:'Player', d:'Press Start.'}, {i:'👾', n:'Bug', d:'Não é falha, é feature.'}, {i:'💾', n:'Save', d:'Progresso salvo.'}, {i:'🎲', n:'RNG', d:'Sorte no drop.'}, {i:'🎮', n:'Control', d:'Domine o jogo.'}, {i:'🏆', n:'Achievement', d:'Conquista desbloqueada.'}, {i:'📺', n:'Screen', d:'Tempo de tela.'}, {i:'🖱️', n:'Macro', d:'Automação.'}, {i:'🧬', n:'Code', d:'DNA digital.'}, {i:'🚀', n:'Launch', d:'Lançamento.'}
-        ]
-    };
-
     let user = JSON.parse(localStorage.getItem('user_nikho')) || { level: 1, xp: 0, nextXp: 500, points: 0, streak: 0, badges: [] };
     if(!user.badges) user.badges = [];
 
@@ -451,7 +425,7 @@
             el.onclick = () => {
                 document.getElementById('avatarModal').style.display = 'flex';
                 document.getElementById('modalIconContainer').style.display = 'block';
-                document.getElementById('modalContentBody').innerHTML = ''; // Limpa conteúdo extra
+                document.getElementById('modalContentBody').innerHTML = ''; 
                 document.getElementById('modalIcon').innerText = b.i;
                 document.getElementById('modalName').innerText = hasBadge ? b.n : 'Bloqueado';
                 document.getElementById('modalLvl').innerText = hasBadge ? 'CONQUISTA DESBLOQUEADA' : 'CONQUISTA BLOQUEADA';
@@ -480,7 +454,7 @@
     function showModal(av, unlocked) {
         document.getElementById('avatarModal').style.display = 'flex';
         document.getElementById('modalIconContainer').style.display = 'block';
-        document.getElementById('modalContentBody').innerHTML = ''; // Limpa conteúdo extra
+        document.getElementById('modalContentBody').innerHTML = ''; 
         document.getElementById('modalIcon').innerText = av.i;
         document.getElementById('modalName').innerText = unlocked ? av.n : 'Bloqueado';
         document.getElementById('modalLvl').innerText = unlocked ? `DESBLOQUEADO` : `DESBLOQUEIA NO NÍVEL ${av.l}`;
@@ -490,34 +464,37 @@
 
     function closeModal() { document.getElementById('avatarModal').style.display = 'none'; }
 
+    // --- ATUALIZADO: DETALHES COMPLETOS NO HISTÓRICO ---
     function verDetalhesDia(dataStr) {
         const diaTreino = hist.find(h => h.data === dataStr);
         if(!diaTreino) return;
 
         document.getElementById('avatarModal').style.display = 'flex';
-        document.getElementById('modalIconContainer').style.display = 'none'; // Esconde ícone de avatar
+        document.getElementById('modalIconContainer').style.display = 'none';
         
         document.getElementById('modalName').innerText = `Treino de ${dataStr.split('/').slice(0,2).join('/')}`;
         document.getElementById('modalLvl').innerText = `${diaTreino.calTotal} KCAL GASTAS`;
         document.getElementById('modalLvl').style.color = 'var(--cardio)';
-        document.getElementById('modalDesc').innerText = "Resumo das atividades realizadas:";
+        document.getElementById('modalDesc').innerText = "Resumo detalhado:";
 
         let htmlContent = `<div style="border-top:1px solid var(--border); padding-top:10px; margin-top:10px;">`;
         
         if (diaTreino.exercicios && diaTreino.exercicios.length > 0) {
             diaTreino.exercicios.forEach(ex => {
-                const melhorSerie = ex.series.reduce((max, s) => Math.max(max, parseFloat(s.p)||0), 0);
+                // Monta string de todas as séries
+                const seriesDet = ex.series.map(s => `${s.r}x${s.p}kg`).join(', ');
+                
                 htmlContent += `
-                    <div style="background:var(--input-bg); padding:8px; border-radius:6px; margin-bottom:5px; display:flex; justify-content:space-between;">
-                        <span style="font-weight:bold;">${ex.nome}</span>
-                        <span style="color:var(--primary); font-size:11px;">Max: ${melhorSerie}kg</span>
+                    <div style="background:var(--input-bg); padding:8px; border-radius:6px; margin-bottom:5px;">
+                        <div style="font-weight:bold; margin-bottom:2px;">${ex.nome}</div>
+                        <div style="color:var(--muted); font-size:10px;">${seriesDet}</div>
                     </div>`;
             });
         } else {
             htmlContent += `<div style="color:var(--muted); font-style:italic;">Apenas Cardio registrado.</div>`;
         }
         
-        htmlContent += `<div style="margin-top:15px; font-size:10px; color:var(--gold); text-align:center;">🌟 Continue consistente para mais conquistas!</div>`;
+        htmlContent += `<div style="margin-top:15px; font-size:10px; color:var(--gold); text-align:center;">🌟 Continue consistente!</div>`;
         
         htmlContent += `</div>`;
         document.getElementById('modalContentBody').innerHTML = htmlContent;
@@ -537,6 +514,24 @@
     function iniciarTreinoUI() {
         document.getElementById('dashboard-header').style.display = 'none';
         document.getElementById('workout-area').classList.add('visible');
+        
+        // POPULA O DROPDOWN DE FICHAS AO INICIAR
+        const fichas = JSON.parse(localStorage.getItem('fichas_nikho')) || [];
+        const select = document.getElementById('selectFichaTreino');
+        if(fichas.length > 0) {
+            select.innerHTML = `<option value="">📂 Carregar Ficha Salva...</option>` + 
+                fichas.map(f => `<option value="${f.txt.replace(/\n/g, '|')}">${f.t}</option>`).join('');
+        } else {
+            select.innerHTML = `<option value="">Sem fichas salvas</option>`;
+        }
+    }
+    
+    // NOVA FUNÇÃO PARA CARREGAR DO DROPDOWN
+    function carregarFichaNoTreino(txt) {
+        if(!txt) return;
+        carregarFicha(txt);
+        // Reseta o select para o título
+        document.getElementById('selectFichaTreino').value = "";
     }
 
     function voltarParaDashboard() {
@@ -544,14 +539,10 @@
         document.getElementById('dashboard-header').style.display = 'block';
     }
 
-    // --- ATUALIZADO: SMART FILL PARA EXERCÍCIOS INDIVIDUAIS ---
     function addEx() {
         const n = document.getElementById('exNome').value;
         if(n) {
-            // Cria series padrão zeradas
             let seriesToUse = [{r:'',p:''},{r:'',p:''},{r:'',p:''}];
-
-            // Tenta achar histórico
             const lastRecord = hist.slice().reverse().find(h => 
                 h.exercicios.some(e => e.nome.toLowerCase() === n.toLowerCase().trim())
             );
@@ -559,7 +550,6 @@
             if(lastRecord) {
                 const lastEx = lastRecord.exercicios.find(e => e.nome.toLowerCase() === n.toLowerCase().trim());
                 if(lastEx && lastEx.series) {
-                    // Copia os dados do último treino (Deep copy)
                     seriesToUse = JSON.parse(JSON.stringify(lastEx.series));
                 }
             }
@@ -589,13 +579,16 @@
     function editSerie(id, i, f, v) { sessao.find(e => e.id === id).series[i][f] = v; }
     function removerEx(id) { sessao = sessao.filter(e => e.id !== id); renderSessao(); }
 
+    // --- ATUALIZADO: DETALHES COMPLETOS NO INPUT ---
     function buscarReferencia(nome) {
         if (!nome || nome.length < 2) return;
         const termo = nome.toLowerCase().trim();
         const ultimo = hist.slice().reverse().find(t => (t.exercicios || []).some(e => e.nome.toLowerCase().includes(termo)));
         if (ultimo) {
             const exData = ultimo.exercicios.find(e => e.nome.toLowerCase().includes(termo));
-            document.getElementById('referenciaPeso').innerText = `Última: ${exData.series[0].p}kg (${exData.series[0].r} reps)`;
+            // Monta string com todas as séries
+            const details = exData.series.map((s, i) => `${i+1}ª: ${s.r}x${s.p}kg`).join(' | ');
+            document.getElementById('referenciaPeso').innerText = `Última: ${details}`;
         }
     }
 
@@ -649,15 +642,11 @@
         document.getElementById('listaFichas').innerHTML = f.map(item => `<div class="card" onclick="carregarFicha('${item.txt.replace(/\n/g, '|')}')"><strong>${item.t}</strong><br><small style="color:var(--muted)">Toque para carregar</small></div>`).join('');
     }
     
-    // --- ATUALIZADO: SMART FILL PARA FICHAS ---
     function carregarFicha(txt) {
         txt.split('|').forEach(n => { 
             const cleanName = n.trim();
             if(cleanName) {
-                // Cria series padrão zeradas
                 let seriesToUse = [{r:'',p:''},{r:'',p:''},{r:'',p:''}];
-
-                // Tenta achar histórico para este exercício específico
                 const lastRecord = hist.slice().reverse().find(h => 
                     h.exercicios.some(e => e.nome.toLowerCase() === cleanName.toLowerCase())
                 );
@@ -665,7 +654,6 @@
                 if(lastRecord) {
                     const lastEx = lastRecord.exercicios.find(e => e.nome.toLowerCase() === cleanName.toLowerCase());
                     if(lastEx && lastEx.series) {
-                        // Copia os dados do último treino (Deep copy)
                         seriesToUse = JSON.parse(JSON.stringify(lastEx.series));
                     }
                 }
@@ -678,8 +666,12 @@
             }
         });
         renderSessao(); 
-        switchTab('treinar'); 
-        iniciarTreinoUI();
+        // Se já estiver no treino (chamado pelo select), não precisa mudar tab ou iniciar UI de novo,
+        // mas se for chamado da aba Fichas, executa:
+        if(!document.getElementById('workout-area').classList.contains('visible')) {
+            switchTab('treinar'); 
+            iniciarTreinoUI();
+        }
     }
 
     function renderCalendario() {
