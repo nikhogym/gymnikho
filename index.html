@@ -365,6 +365,39 @@
         'ecosystem': { name: 'Digital', avatars: [ { l:1, i:'⚫', n:'Pixel', d:'Um ponto na tela.' }, { l:3, i:'👾', n:'Glitch', d:'Erro no sistema.' }, { l:5, i:'💾', n:'8-Bit', d:'A era de ouro.' }, { l:8, i:'🕹️', n:'Joystick', d:'Controle total.' }, { l:12, i:'🌐', n:'Web', d:'Conectado a tudo.' }, { l:16, i:'🛡️', n:'Firewall', d:'Defesa impenetrável.' }, { l:20, i:'💻', n:'Hacker', d:'Quebrando códigos.' }, { l:25, i:'🕶️', n:'VR', d:'Realidade simulada.' }, { l:30, i:'🧠', n:'Rede Neural', d:'Aprendizado profundo.' }, { l:40, i:'🌌', n:'Metaverso', d:'Realidade infinita.' } ] }
     };
 
+    const BADGE_DATABASE = {
+        'apple': [
+            {i:'🍏', n:'Newton', d:'Começou a entender a gravidade.'}, {i:'🖱️', n:'Click', d:'Primeira ação executada.'}, {i:'📂', n:'Organizer', d:'Vida organizada.'}, {i:'💿', n:'Legacy', d:'Clássico nunca morre.'}, {i:'📡', n:'Wi-Fi', d:'Sinal forte.'}, {i:'⌚', n:'Wearable', d:'Monitorando tudo.'}, {i:'🎨', n:'Design', d:'Estilo impecável.'}, {i:'🔐', n:'Secure', d:'Privacidade máxima.'}, {i:'🦄', n:'Unicorn', d:'Valor de mercado bilionário.'}, {i:'♾️', n:'Loop', d:'Foco infinito.'}
+        ],
+        'performance': [
+            {i:'👟', n:'Start', d:'Deu o primeiro passo.'}, {i:'⏱️', n:'Pacer', d:'Ritmo constante.'}, {i:'🔥', n:'Burn', d:'Queimando tudo.'}, {i:'💪', n:'Strong', d:'Sentindo a força.'}, {i:'🏋️', n:'Lifter', d:'Peso pesado.'}, {i:'🚴', n:'Cyclist', d:'Pedalando longe.'}, {i:'🤸', n:'Flex', d:'Mobilidade em dia.'}, {i:'🥗', n:'Clean', d:'Dieta limpa.'}, {i:'💤', n:'Recover', d:'Sono anabólico.'}, {i:'🏆', n:'Elite', d:'Performance de topo.'}
+        ],
+        'liquid': [
+            {i:'💧', n:'H2O', d:'Hidratação básica.'}, {i:'🏊', n:'Swimmer', d:'Nade, não afunde.'}, {i:'🌊', n:'Wave', d:'Seguindo o fluxo.'}, {i:'🏄', n:'Surfer', d:'Equilíbrio nas ondas.'}, {i:'🛶', n:'Row', d:'Remando contra a maré.'}, {i:'⚓', n:'Anchor', d:'Firmeza mental.'}, {i:'🧊', n:'Ice', d:'Sangue frio.'}, {i:'🚢', n:'Ship', d:'Carga pesada.'}, {i:'🏝️', n:'Island', d:'Seu refúgio.'}, {i:'🌀', n:'Storm', d:'Caos controlado.'}
+        ],
+        'apex': [
+            {i:'🥚', n:'Nest', d:'Protegendo o ganho.'}, {i:'🐾', n:'Track', d:'Rastreando a meta.'}, {i:'🦷', n:'Bite', d:'Agarrou a chance.'}, {i:'👁️', n:'Hunter', d:'Olhos no prêmio.'}, {i:'🍖', n:'Carnivore', d:'Proteína pura.'}, {i:'🩸', n:'Blood', d:'Esforço vital.'}, {i:'🦴', n:'Bone', d:'Estrutura sólida.'}, {i:'🦁', n:'Roar', d:'Voz de comando.'}, {i:'👑', n:'King', d:'Topo da cadeia.'}, {i:'⚔️', n:'Survival', d:'Apenas os fortes.'}
+        ],
+        'nebula': [
+            {i:'🌑', n:'Void', d:'Começando do nada.'}, {i:'✨', n:'Spark', d:'Pequeno brilho.'}, {i:'🔭', n:'Vision', d:'Olhando longe.'}, {i:'🛸', n:'UFO', d:'Movimento estranho.'}, {i:'👽', n:'Alien', d:'Treino de outro mundo.'}, {i:'👩‍🚀', n:'Astro', d:'Sem gravidade.'}, {i:'🪐', n:'Ring', d:'Compromisso orbital.'}, {i:'🌠', n:'Wish', d:'Sonho realizado.'}, {i:'🌞', n:'Sol', d:'Centro das atenções.'}, {i:'🌌', n:'Verse', d:'Expansão total.'}
+        ],
+        'volt': [
+            {i:'🔌', n:'Plug', d:'Ligado na tomada.'}, {i:'🔋', n:'Cell', d:'Armazenando carga.'}, {i:'⚡', n:'Zap', d:'Choque de realidade.'}, {i:'💡', n:'Bright', d:'Ideia genial.'}, {i:'🏭', n:'Power', d:'Força bruta.'}, {i:'🚧', n:'Danger', d:'Alta tensão.'}, {i:'🌩️', n:'Storm', d:'Energia instável.'}, {i:'🧲', n:'Magnet', d:'Atraindo sucesso.'}, {i:'🔦', n:'Beam', d:'Foco laser.'}, {i:'☢️', n:'Nuke', d:'Explosivo.'}
+        ],
+        'titanium': [
+            {i:'🔩', n:'Bolt', d:'Tudo ajustado.'}, {i:'🔧', n:'Fix', d:'Corrigindo falhas.'}, {i:'🔨', n:'Hammer', d:'Batendo forte.'}, {i:'🏗️', n:'Build', d:'Construindo o shape.'}, {i:'📐', n:'Plan', d:'Engenharia corporal.'}, {i:'🦾', n:'Arm', d:'Braço de ferro.'}, {i:'🦿', n:'Leg', d:'Base de aço.'}, {i:'🛡️', n:'Shield', d:'Defesa impenetrável.'}, {i:'⚙️', n:'Gear', d:'Sistema rodando.'}, {i:'🚀', n:'Boost', d:'Propulsão extra.'}
+        ],
+        'vitality': [
+            {i:'🌱', n:'Grow', d:'Crescimento natural.'}, {i:'🍂', n:'Cycle', d:'Respeite as estações.'}, {i:'🍄', n:'Fungi', d:'Rede oculta.'}, {i:'🌵', n:'Dry', d:'Resiliência na seca.'}, {i:'🌴', n:'Tall', d:'Sombra e água fresca.'}, {i:'🪵', n:'Log', d:'Histórico sólido.'}, {i:'🌸', n:'Bloom', d:'Auge da forma.'}, {i:'🏞️', n:'Valley', d:'Jornada tranquila.'}, {i:'⛰️', n:'Peak', d:'Topo do mundo.'}, {i:'🌎', n:'Mother', d:'Origem de tudo.'}
+        ],
+        'aurora': [
+            {i:'❄️', n:'Chill', d:'Cabeça fria.'}, {i:'🥶', n:'Cold', d:'Treino gelado.'}, {i:'🌨️', n:'Snow', d:'Acumulando ganhos.'}, {i:'🌬️', n:'Wind', d:'Sopro de mudança.'}, {i:'🌫️', n:'Fog', d:'Mistério no ar.'}, {i:'🎿', n:'Ski', d:'Deslizando fácil.'}, {i:'🏔️', n:'Everest', d:'Desafio supremo.'}, {i:'🧥', n:'Warm', d:'Aquecimento feito.'}, {i:'🍵', n:'Tea', d:'Calma interior.'}, {i:'🧊', n:'Solid', d:'Inquebrável.'}
+        ],
+        'ecosystem': [
+            {i:'🕹️', n:'Player', d:'Press Start.'}, {i:'👾', n:'Bug', d:'Não é falha, é feature.'}, {i:'💾', n:'Save', d:'Progresso salvo.'}, {i:'🎲', n:'RNG', d:'Sorte no drop.'}, {i:'🎮', n:'Control', d:'Domine o jogo.'}, {i:'🏆', n:'Achievement', d:'Conquista desbloqueada.'}, {i:'📺', n:'Screen', d:'Tempo de tela.'}, {i:'🖱️', n:'Macro', d:'Automação.'}, {i:'🧬', n:'Code', d:'DNA digital.'}, {i:'🚀', n:'Launch', d:'Lançamento.'}
+        ]
+    };
+
     let user = JSON.parse(localStorage.getItem('user_nikho')) || { level: 1, xp: 0, nextXp: 500, points: 0, streak: 0, badges: [] };
     if(!user.badges) user.badges = [];
 
