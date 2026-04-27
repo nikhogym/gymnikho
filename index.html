@@ -467,6 +467,139 @@ gap: 12px;
 
 /* ===== FILE IMPORT ===== */
 #file-input { display: none; }
+
+/* ===== EDIT MODAL ===== */
+.edit-modal-overlay {
+display: none;
+position: fixed; inset: 0;
+background: rgba(44,30,15,0.45);
+backdrop-filter: blur(5px);
+z-index: 2000;
+align-items: center;
+justify-content: center;
+}
+.edit-modal-overlay.open { display: flex; }
+.edit-modal {
+background: #FFFFFF;
+border-radius: 20px;
+padding: 28px 28px 24px;
+width: 90%;
+max-width: 440px;
+box-shadow: 0 16px 60px rgba(44,30,15,0.2);
+animation: slideUp 0.22s ease;
+}
+@keyframes slideUp {
+from { transform: translateY(18px); opacity: 0; }
+to   { transform: translateY(0);    opacity: 1; }
+}
+.edit-modal-header {
+display: flex; justify-content: space-between; align-items: flex-start;
+margin-bottom: 20px;
+}
+.edit-modal-header h3 {
+font-family: Georgia, serif;
+font-size: 1.15rem;
+color: #4A2E18;
+line-height: 1.3;
+max-width: 340px;
+}
+.edit-modal-header p {
+font-size: 0.78rem;
+color: #B0A090;
+margin-top: 4px;
+}
+.edit-close {
+background: #F5F2EC;
+border: none;
+border-radius: 8px;
+width: 30px; height: 30px;
+cursor: pointer;
+font-size: 1rem;
+color: #7A6A55;
+flex-shrink: 0;
+margin-left: 12px;
+display: flex; align-items: center; justify-content: center;
+}
+.edit-field { margin-bottom: 16px; }
+.edit-field label {
+display: block;
+font-size: 0.76rem;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.07em;
+color: #7A6A55;
+margin-bottom: 6px;
+}
+.edit-field input, .edit-field select {
+width: 100%;
+padding: 10px 14px;
+border: 1.5px solid #EDE8E0;
+border-radius: 10px;
+font-size: 0.92rem;
+font-family: inherit;
+color: #2C1E0F;
+background: #FAF8F5;
+outline: none;
+transition: border-color 0.18s;
+}
+.edit-field input:focus, .edit-field select:focus {
+border-color: #C8843A;
+background: #FDF3E7;
+}
+.edit-actions {
+display: flex; gap: 10px; margin-top: 8px;
+}
+.edit-save {
+flex: 1;
+padding: 11px;
+background: #7B4F2E;
+color: white;
+border: none;
+border-radius: 10px;
+font-size: 0.9rem;
+font-weight: 600;
+cursor: pointer;
+transition: background 0.18s;
+}
+.edit-save:hover { background: #C8843A; }
+.edit-cancel {
+padding: 11px 20px;
+background: #F5F2EC;
+color: #7A6A55;
+border: none;
+border-radius: 10px;
+font-size: 0.9rem;
+font-weight: 600;
+cursor: pointer;
+}
+/* edit pencil button on txn rows */
+.txn-edit-btn {
+background: none;
+border: 1.5px solid #EDE8E0;
+border-radius: 7px;
+padding: 4px 8px;
+cursor: pointer;
+font-size: 0.8rem;
+color: #B0A090;
+flex-shrink: 0;
+transition: all 0.15s;
+}
+.txn-edit-btn:hover {
+background: #FDF3E7;
+border-color: #C8843A;
+color: #C8843A;
+}
+.edited-badge {
+display: inline-block;
+font-size: 0.65rem;
+background: #FDF3E7;
+color: #C8843A;
+border-radius: 4px;
+padding: 1px 5px;
+margin-left: 5px;
+font-weight: 600;
+vertical-align: middle;
+}
 .import-hint {
 font-size: 0.75rem;
 color: var(–text-light);
@@ -599,6 +732,44 @@ header .header-right .btn { flex: 1; justify-content: center; }
     <h3 id="modal-title"></h3>
     <p id="modal-sub" style="font-size:0.82rem;color:var(--text-light);margin-bottom:4px;"></p>
     <div class="modal-list" id="modal-list"></div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+
+<div class="edit-modal-overlay" id="edit-modal-overlay">
+  <div class="edit-modal">
+    <div class="edit-modal-header">
+      <div>
+        <h3 id="edit-modal-title">Editar Transação</h3>
+        <p id="edit-modal-sub"></p>
+      </div>
+      <button class="edit-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="edit-field">
+      <label>Nome do estabelecimento</label>
+      <input type="text" id="edit-name-input" placeholder="Nome da transação">
+    </div>
+    <div class="edit-field">
+      <label>Categoria</label>
+      <select id="edit-cat-select">
+        <option value="Alimentação">🍽️ Alimentação</option>
+        <option value="Saúde">💊 Saúde</option>
+        <option value="Transporte">🚗 Transporte</option>
+        <option value="Educação">📚 Educação</option>
+        <option value="Entretenimento">🎵 Entretenimento</option>
+        <option value="Vestuário">👗 Vestuário</option>
+        <option value="Pet">🐾 Pet</option>
+        <option value="Diversos">🎯 Diversos</option>
+        <option value="Moradia">🏠 Moradia</option>
+        <option value="Anuidade">💳 Anuidade</option>
+        <option value="Hobby">🎮 Hobby</option>
+      </select>
+    </div>
+    <div class="edit-actions">
+      <button class="edit-save" onclick="saveEdit()">✅ Salvar e atualizar gráficos</button>
+      <button class="edit-cancel" onclick="closeEditModal()">Cancelar</button>
+    </div>
   </div>
 </div>
 
@@ -767,7 +938,7 @@ const TRANSACTIONS = [
 // =============================================
 // STATE
 // =============================================
-let allData = [...TRANSACTIONS];
+let allData = TRANSACTIONS.map((t, i) => ({...t, _id: i}));
 let currentFatura = 'all';
 let selectedCat = null;
 
@@ -982,24 +1153,27 @@ function selectCategory(cat) {
 
 function showTransactions(cat) {
   const filtered = getFiltered().filter(t => t.cat === cat);
-  const sorted = filtered.sort((a,b) => b.value - a.value);
+  const sorted = [...filtered].sort((a,b) => b.value - a.value);
   const total = sumBy(sorted,'value');
   const conf = CAT_CONFIG[cat] || {icon:'📌', color:'#aaa'};
 
   document.getElementById('panel-title').textContent = conf.icon + ' ' + cat;
-  document.getElementById('panel-count').textContent = `${sorted.length} transações · Total: ${fmt(total)}`;
+  document.getElementById('panel-count').textContent = `${sorted.length} transações · Total: ${fmt(total)} · ✏️ clique no lápis para editar`;
 
-  document.getElementById('txn-list').innerHTML = sorted.map(t => `
-    <div class="txn-item">
+  document.getElementById('txn-list').innerHTML = sorted.map(t => {
+    const editedBadge = t._edited ? '<span class="edited-badge">editado</span>' : '';
+    return `
+    <div class="txn-item" id="txn-row-${t._id}">
       <div class="txn-icon" style="background:${conf.color}22; color:${conf.color}">${conf.icon}</div>
       <div class="txn-info">
-        <div class="txn-name">${t.name}</div>
+        <div class="txn-name">${t.name}${editedBadge}</div>
         <div class="txn-meta">${t.date}${t.parcela ? ` · Parcela ${t.parcela}`:''} · Fatura ${t.fatura==='abr'?'Abril':'Março'}/26</div>
       </div>
       <span class="txn-card-tag">•••${t.cartao}</span>
       <div class="txn-amount">${fmt(t.value)}</div>
+      <button class="txn-edit-btn" onclick="openEditModal(${t._id})" title="Editar nome ou categoria">✏️</button>
     </div>
-  `).join('');
+  `}).join('');
 
   document.getElementById('transactions-panel').style.display = 'block';
   document.getElementById('transactions-panel').scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -1191,7 +1365,7 @@ function importFile(event) {
 
       if(mapped.length === 0) { alert('Nenhuma transação válida encontrada. Verifique as colunas: Data, Estabelecimento, Categoria, Valor, Fatura.'); return; }
 
-      allData = mapped;
+      allData = mapped.map((t, i) => ({...t, _id: i}));
       currentFatura = 'all';
       selectedCat = null;
       document.querySelectorAll('.filter-btn')[0].click();
@@ -1212,6 +1386,77 @@ function closeModal(e) {
   if(e.target === document.getElementById('modal-overlay'))
     document.getElementById('modal-overlay').classList.remove('open');
 }
+
+// =============================================
+// EDIT MODAL
+// =============================================
+let editingId = null;
+
+function openEditModal(id) {
+  const t = allData.find(x => x._id === id);
+  if(!t) return;
+  editingId = id;
+
+  document.getElementById('edit-modal-title').textContent = '✏️ Editar Transação';
+  document.getElementById('edit-modal-sub').textContent = `${t.date} · ${fmt(t.value)} · Fatura ${t.fatura==='abr'?'Abril':'Março'}/26`;
+  document.getElementById('edit-name-input').value = t.name;
+  document.getElementById('edit-cat-select').value = t.cat;
+
+  document.getElementById('edit-modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('edit-name-input').focus(), 80);
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal-overlay').classList.remove('open');
+  editingId = null;
+}
+
+function saveEdit() {
+  if(editingId === null) return;
+  const idx = allData.findIndex(x => x._id === editingId);
+  if(idx === -1) return;
+
+  const newName = document.getElementById('edit-name-input').value.trim();
+  const newCat  = document.getElementById('edit-cat-select').value;
+
+  if(!newName) { document.getElementById('edit-name-input').focus(); return; }
+
+  const oldCat = allData[idx].cat;
+  allData[idx] = { ...allData[idx], name: newName, cat: newCat, _edited: true };
+
+  closeEditModal();
+
+  // Full re-render so every section reflects the change
+  renderKPIs();
+  renderCharts();
+  renderCategories();
+  renderAttention();
+  renderInsights();
+
+  // If the panel was open, re-open on the right category
+  // If cat changed, switch panel to new cat; else refresh current
+  const targetCat = newCat !== oldCat ? newCat : selectedCat;
+  if(selectedCat) {
+    selectedCat = targetCat;
+    renderCategories();
+    showTransactions(targetCat);
+  }
+
+  // Flash the updated row briefly
+  setTimeout(() => {
+    const row = document.getElementById(`txn-row-${editingId === null ? allData[idx]._id : allData.find(x=>x.name===newName&&x._edited)._id}`);
+    if(row) {
+      row.style.transition = 'background 0.3s';
+      row.style.background = '#FDF3E7';
+      setTimeout(() => row.style.background = '', 1200);
+    }
+  }, 100);
+}
+
+// Close edit modal clicking backdrop
+document.getElementById('edit-modal-overlay').addEventListener('click', e => {
+  if(e.target === document.getElementById('edit-modal-overlay')) closeEditModal();
+});
 
 // =============================================
 // RENDER ALL
