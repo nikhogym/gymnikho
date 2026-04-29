@@ -848,94 +848,6 @@ text-align: center;
 .del-confirm-box p { font-size: 0.84rem; color: #7A6A55; margin-bottom: 20px; }
 .del-confirm-btns { display: flex; gap: 10px; justify-content: center; }
 
-/* ===== IMPORT HISTORY ===== */
-.import-history-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-gap: 14px;
-margin-bottom: 20px;
-}
-.import-card {
-background: white;
-border-radius: 14px;
-border: 1.5px solid #EDE8E0;
-box-shadow: 0 3px 14px rgba(120,80,30,0.07);
-padding: 18px 20px;
-transition: all 0.2s;
-position: relative;
-overflow: hidden;
-}
-.import-card::before {
-content: ‘’;
-position: absolute; left: 0; top: 0; bottom: 0;
-width: 4px;
-background: var(–accent, #C8843A);
-border-radius: 2px 0 0 2px;
-}
-.import-card.disabled { opacity: 0.5; }
-.import-card.disabled::before { background: #B0A090; }
-.import-card-header {
-display: flex; justify-content: space-between; align-items: flex-start;
-margin-bottom: 10px;
-}
-.import-card-label {
-font-size: 0.92rem; font-weight: 700; color: #2C1E0F;
-line-height: 1.3; flex: 1; margin-right: 10px;
-}
-.import-card-toggle {
-flex-shrink: 0;
-width: 40px; height: 22px;
-background: #B0A090;
-border-radius: 11px;
-border: none;
-cursor: pointer;
-position: relative;
-transition: background 0.2s;
-}
-.import-card-toggle.on { background: #7A8C5E; }
-.import-card-toggle::after {
-content: ‘’;
-position: absolute;
-top: 3px; left: 3px;
-width: 16px; height: 16px;
-border-radius: 50%;
-background: white;
-transition: left 0.2s;
-box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.import-card-toggle.on::after { left: 21px; }
-.import-card-meta {
-font-size: 0.75rem; color: #B0A090; margin-bottom: 8px;
-display: flex; gap: 12px; flex-wrap: wrap;
-}
-.import-card-stats {
-display: flex; gap: 10px; flex-wrap: wrap;
-}
-.import-stat {
-background: #F5F2EC; border-radius: 8px;
-padding: 4px 10px; font-size: 0.75rem; color: #7A6A55; font-weight: 600;
-}
-.import-stat.highlight { background: #FDF3E7; color: #C8843A; }
-.import-card-actions {
-margin-top: 12px; display: flex; gap: 8px; align-items: center;
-}
-.import-del-btn {
-padding: 5px 12px; border-radius: 8px;
-border: 1.5px solid #D95F5F; background: none;
-color: #D95F5F; font-size: 0.78rem; font-weight: 600;
-cursor: pointer; font-family: inherit;
-transition: all 0.15s;
-}
-.import-del-btn:hover { background: #FEF0F0; }
-.import-rename-btn {
-padding: 5px 12px; border-radius: 8px;
-border: 1.5px solid #EDE8E0; background: none;
-color: #7A6A55; font-size: 0.78rem; font-weight: 600;
-cursor: pointer; font-family: inherit;
-transition: all 0.15s;
-}
-.import-rename-btn:hover { border-color: #C8843A; color: #C8843A; }
-
 /* ===== FOOTER ===== */
 footer {
 text-align: center;
@@ -994,7 +906,6 @@ header { padding: 18px 16px; flex-direction: column; align-items: flex-start; ga
 <div class="tabs-bar">
   <button class="tab-btn active" id="tab-dash" onclick="switchTab('dash')">📊 Dashboard</button>
   <button class="tab-btn" id="tab-sheet" onclick="switchTab('sheet')">📋 Planilha</button>
-  <button class="tab-btn" id="tab-imports" onclick="switchTab('imports')">📥 Importações</button>
 </div>
 
 <main>
@@ -1122,31 +1033,6 @@ header { padding: 18px 16px; flex-direction: column; align-items: flex-start; ga
 
 </div><!-- /panel-sheet -->
 
-<!-- ═══════════════ IMPORTAÇÕES ═══════════════ -->
-
-<div class="tab-panel" id="panel-imports">
-
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-    <div>
-      <div class="section-title" style="margin-bottom:4px">📥 Histórico de Importações</div>
-      <p style="font-size:0.82rem; color:#B0A090">Ative ou desative remessas para refletir no Dashboard e na Planilha em tempo real.</p>
-    </div>
-    <button class="btn-sheet primary" onclick="document.getElementById('file-input').click()" style="display:flex;align-items:center;gap:8px;padding:11px 20px">
-      ➕ Nova importação
-    </button>
-  </div>
-
-  <div class="import-history-grid" id="import-history-grid">
-    <!-- Populated by JS -->
-  </div>
-
-  <div style="background:white; border-radius:14px; border:1.5px solid #EDE8E0; padding:20px; margin-top:8px;">
-    <div style="font-size:0.85rem; font-weight:700; color:#4A2E18; margin-bottom:12px;">📊 Resumo das remessas ativas</div>
-    <div id="import-summary-stats" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px;"></div>
-  </div>
-
-</div><!-- /panel-imports -->
-
 <!-- Delete confirm dialog -->
 
 <div class="del-confirm" id="del-confirm">
@@ -1230,226 +1116,200 @@ header { padding: 18px 16px; flex-direction: column; align-items: flex-start; ga
 // =============================================
 // DATA — extracted from both PDFs
 // =============================================
-// =============================================
-// DATA — source: Excel exportado 29/04/2026
-// =============================================
+const TRANSACTIONS = [
 
-// Sistema de importações — cada entrada é uma remessa
-// id, label, date, rows[]
-const IMPORT_BATCHES = [
-  {
-    id: "batch_initial",
-    label: "📊 Dados iniciais (Excel 29/04/2026)",
-    date: "29/04/2026",
-    source: "Excel exportado",
-    faturas: ["mar","abr"],
-    rows: [
-      {date:"22/12",name:"Amazon BR - iPhone 16",cat:"Hobby",value:438.83,fatura:"abr",cartao:"0904",parcela:"05/12"},
-      {date:"22/12",name:"Amazon BR - iPhone 16",cat:"Hobby",value:438.83,fatura:"mar",cartao:"0904",parcela:"04/12"},
-      {date:"22/12",name:"Amazon BR - iPhone 16",cat:"Hobby",value:438.83,fatura:"mar",cartao:"0904",parcela:"06/12"},
-      {date:"12/03",name:"Atacadao 680AS",cat:"Alimentação",value:422.72,fatura:"mar",cartao:"2040"},
-      {date:"02/04",name:"Petz Mooca",cat:"Pet",value:210.0,fatura:"abr",cartao:"1518"},
-      {date:"05/04",name:"AutoPostoKanTan",cat:"Transporte",value:186.62,fatura:"abr",cartao:"1518"},
-      {date:"19/04",name:"Posto Carreteiro 2",cat:"Transporte",value:177.87,fatura:"abr",cartao:"1518"},
-      {date:"14/03",name:"Supermercado Negreiros",cat:"Alimentação",value:157.13,fatura:"mar",cartao:"1518"},
-      {date:"22/03",name:"Drogasil1825",cat:"Saúde",value:149.84,fatura:"mar",cartao:"2040"},
-      {date:"06/02",name:"Riachuelo 232",cat:"Vestuário",value:134.98,fatura:"mar",cartao:"2040",parcela:"02/02"},
-      {date:"27/06",name:"EstudioMater",cat:"Diversos",value:129.9,fatura:"abr",cartao:"0904",parcela:"10/10"},
-      {date:"27/06",name:"EstudioMater",cat:"Diversos",value:129.9,fatura:"mar",cartao:"0904",parcela:"09/10"},
-      {date:"16/03",name:"RAIA2580",cat:"Saúde",value:121.98,fatura:"mar",cartao:"1518"},
-      {date:"02/04",name:"Raia Drogasil SA",cat:"Saúde",value:120.53,fatura:"abr",cartao:"2040"},
-      {date:"28/01",name:"Shopee *BejinhoNo",cat:"Vestuário",value:104.9,fatura:"mar",cartao:"0904",parcela:"02/02"},
-      {date:"27/04",name:"Raia Drogasil SA",cat:"Saúde",value:102.99,fatura:"mar",cartao:"2040"},
-      {date:"25/02",name:"Wellhub Nikholas Pifan",cat:"Saúde",value:99.99,fatura:"mar",cartao:"1518"},
-      {date:"09/04",name:"Pague Menos A11",cat:"Saúde",value:99.98,fatura:"abr",cartao:"2040",parcela:"01/02"},
-      {date:"09/04",name:"Pague Menos A11",cat:"Saúde",value:99.98,fatura:"mar",cartao:"2040",parcela:"02/02"},
-      {date:"19/04",name:"Apple.com/Bill",cat:"Entretenimento",value:99.9,fatura:"abr",cartao:"1518"},
-      {date:"19/03",name:"AppleCom/Bill",cat:"Entretenimento",value:99.9,fatura:"mar",cartao:"1518"},
-      {date:"28/12",name:"Raia Drogasil SA",cat:"Saúde",value:96.37,fatura:"mar",cartao:"2040",parcela:"03/03"},
-      {date:"24/02",name:"RD Saude",cat:"Saúde",value:96.22,fatura:"abr",cartao:"2040",parcela:"02/02"},
-      {date:"24/02",name:"RD Saude",cat:"Saúde",value:96.22,fatura:"mar",cartao:"2040",parcela:"01/02"},
-      {date:"05/03",name:"Atacadao 680AS",cat:"Alimentação",value:96.03,fatura:"mar",cartao:"1518"},
-      {date:"13/04",name:"RD Saude Online",cat:"Saúde",value:93.02,fatura:"abr",cartao:"2040",parcela:"01/02"},
-      {date:"13/04",name:"RD Saude Online",cat:"Saúde",value:93.02,fatura:"mar",cartao:"2040",parcela:"02/02"},
-      {date:"26/03",name:"Joanin",cat:"Alimentação",value:92.71,fatura:"abr",cartao:"1518"},
-      {date:"04/03",name:"Shopee *Spotlight82",cat:"Compras Online",value:86.1,fatura:"mar",cartao:"0904"},
-      {date:"26/11",name:"Shopee *Masterchai",cat:"Compras Online",value:82.85,fatura:"mar",cartao:"0904",parcela:"04/04"},
-      {date:"28/01",name:"RD Saude",cat:"Saúde",value:80.91,fatura:"mar",cartao:"2040",parcela:"02/02"},
-      {date:"13/04",name:"Shopee *HCarBrindeSImp",cat:"Compras Online",value:75.14,fatura:"abr",cartao:"0904"},
-      {date:"10/01",name:"Leitura",cat:"Hobby",value:74.81,fatura:"abr",cartao:"1518",parcela:"04/05"},
-      {date:"10/01",name:"Leitura",cat:"Hobby",value:74.81,fatura:"mar",cartao:"1518",parcela:"03/05"},
-      {date:"10/01",name:"Leitura",cat:"Hobby",value:74.81,fatura:"mar",cartao:"1518",parcela:"05/05"},
-      {date:"23/03",name:"MP *PetDonalds",cat:"Pet",value:72.5,fatura:"mar",cartao:"0904"},
-      {date:"07/03",name:"RAIA2580",cat:"Saúde",value:69.56,fatura:"abr",cartao:"2040",parcela:"02/03"},
-      {date:"07/03",name:"RAIA2580",cat:"Saúde",value:69.56,fatura:"mar",cartao:"2040",parcela:"01/03"},
-      {date:"07/03",name:"RAIA2580",cat:"Saúde",value:69.56,fatura:"mar",cartao:"2040",parcela:"03/03"},
-      {date:"07/03",name:"Flora Agrotrevo",cat:"Diversos",value:66.0,fatura:"mar",cartao:"2040"},
-      {date:"26/03",name:"RD Saude Online",cat:"Saúde",value:65.84,fatura:"abr",cartao:"2040",parcela:"01/02"},
-      {date:"21/03",name:"Drogaria Online",cat:"Saúde",value:62.39,fatura:"abr",cartao:"2040",parcela:"02/02"},
-      {date:"21/03",name:"Drogaria Online",cat:"Saúde",value:62.39,fatura:"mar",cartao:"2040",parcela:"01/02"},
-      {date:"16/02",name:"RD Saude",cat:"Saúde",value:60.9,fatura:"mar",cartao:"2040",parcela:"02/02"},
-      {date:"26/03",name:"Anuidade Diferenciada",cat:"Anuidade",value:60.0,fatura:"abr",cartao:"serv",parcela:"10/12"},
-      {date:"23/02",name:"Anuidade Diferenciada",cat:"Anuidade",value:60.0,fatura:"mar",cartao:"serv",parcela:"09/12"},
-      {date:"25/04",name:"Anuidade Diferenciada",cat:"Anuidade",value:60.0,fatura:"mar",cartao:"2040",parcela:"11/12"},
-      {date:"20/02",name:"AmazonMktplc*Leituraca",cat:"Educação",value:59.9,fatura:"mar",cartao:"0904"},
-      {date:"09/03",name:"AmazonMktplc*Inter",cat:"Compras Online",value:57.51,fatura:"abr",cartao:"0904",parcela:"02/03"},
-      {date:"09/03",name:"AmazonMktplc*Inter",cat:"Compras Online",value:57.51,fatura:"mar",cartao:"0904",parcela:"01/03"},
-      {date:"09/03",name:"AmazonMktplc*Inter",cat:"Compras Online",value:57.51,fatura:"mar",cartao:"0904",parcela:"03/03"},
-      {date:"14/03",name:"MP *Estacionament",cat:"Transporte",value:55.0,fatura:"mar",cartao:"1518"},
-      {date:"28/02",name:"Drogaria Sao Paulo 618",cat:"Saúde",value:53.6,fatura:"mar",cartao:"1518"},
-      {date:"06/04",name:"Joanin",cat:"Alimentação",value:52.95,fatura:"abr",cartao:"1518"},
-      {date:"11/04",name:"Pague Menos",cat:"Saúde",value:51.52,fatura:"abr",cartao:"2040",parcela:"02/02"},
-      {date:"12/04",name:"TagItau*GiovannaRocha",cat:"Transporte",value:50.0,fatura:"abr",cartao:"2040"},
-      {date:"11/04",name:"Kee*Maisa Santos Sil",cat:"Alimentação",value:45.26,fatura:"abr",cartao:"1518"},
-      {date:"15/04",name:"Dietitian",cat:"Saúde",value:44.9,fatura:"abr",cartao:"2040"},
-      {date:"20/04",name:"RAIA2975",cat:"Saúde",value:44.89,fatura:"abr",cartao:"2040"},
-      {date:"11/03",name:"Drogaria Online",cat:"Saúde",value:43.76,fatura:"mar",cartao:"2040"},
-      {date:"26/04",name:"Shein *shein.com",cat:"Vestuário",value:41.39,fatura:"mar",cartao:"2040"},
-      {date:"30/03",name:"EBN*Spotify",cat:"Entretenimento",value:40.9,fatura:"abr",cartao:"0904"},
-      {date:"28/02",name:"EBN *Spotify",cat:"Entretenimento",value:40.9,fatura:"mar",cartao:"0904"},
-      {date:"05/04",name:"Atacadao 680AS",cat:"Alimentação",value:40.8,fatura:"abr",cartao:"1518"},
-      {date:"11/04",name:"STB*Pavao Penha",cat:"Diversos",value:40.0,fatura:"abr",cartao:"2040"},
-      {date:"11/04",name:"Loja Bebe Urbano",cat:"Vestuário",value:40.0,fatura:"abr",cartao:"2040",parcela:"01/03"},
-      {date:"11/04",name:"Loja Bebe Urbano",cat:"Vestuário",value:40.0,fatura:"mar",cartao:"2040",parcela:"02/03"},
-      {date:"23/02",name:"Shopee *Sunrise",cat:"Compras Online",value:39.0,fatura:"mar",cartao:"0904"},
-      {date:"26/03",name:"Uber TRIP",cat:"Transporte",value:38.98,fatura:"abr",cartao:"2040"},
-      {date:"22/04",name:"Espetinho Lion",cat:"Alimentação",value:37.0,fatura:"abr",cartao:"1518"},
-      {date:"29/03",name:"PostoDeRevendaDe",cat:"Transporte",value:36.96,fatura:"abr",cartao:"1518"},
-      {date:"25/03",name:"Uber TRIP",cat:"Transporte",value:35.95,fatura:"abr",cartao:"2040"},
-      {date:"24/02",name:"Shopee *MiguelitoKids2",cat:"Vestuário",value:35.9,fatura:"mar",cartao:"0904"},
-      {date:"19/03",name:"Atacadao 680AS",cat:"Alimentação",value:35.12,fatura:"mar",cartao:"1518"},
-      {date:"06/03",name:"KeetaBR*Carla Fernanda",cat:"Alimentação",value:35.08,fatura:"mar",cartao:"2040"},
-      {date:"26/03",name:"AppleCom/Bill",cat:"Entretenimento",value:35.0,fatura:"abr",cartao:"2040"},
-      {date:"26/02",name:"AppleCom/Bill",cat:"Entretenimento",value:35.0,fatura:"mar",cartao:"2040"},
-      {date:"26/04",name:"Apple.com/Bill",cat:"Entretenimento",value:35.0,fatura:"mar",cartao:"2040"},
-      {date:"19/04",name:"DUD - Dutra Drive",cat:"Alimentação",value:34.8,fatura:"abr",cartao:"2040"},
-      {date:"26/02",name:"Keeta*62 990 032 MA",cat:"Alimentação",value:33.63,fatura:"mar",cartao:"1518"},
-      {date:"27/02",name:"Pastelaria O-CT WA",cat:"Alimentação",value:33.0,fatura:"mar",cartao:"2040"},
-      {date:"07/03",name:"SESC Ipiranga",cat:"Lazer",value:32.5,fatura:"mar",cartao:"1518"},
-      {date:"04/04",name:"Boa Hora",cat:"Alimentação",value:31.67,fatura:"abr",cartao:"1518"},
-      {date:"29/03",name:"Katia Monteiro da Sil",cat:"Diversos",value:30.0,fatura:"abr",cartao:"1518"},
-      {date:"02/04",name:"Niko Lanchonete",cat:"Alimentação",value:29.9,fatura:"abr",cartao:"1518"},
-      {date:"05/04",name:"RAIA2082",cat:"Saúde",value:29.14,fatura:"abr",cartao:"1518"},
-      {date:"22/02",name:"Emporio Villa Verde",cat:"Alimentação",value:26.6,fatura:"mar",cartao:"2040"},
-      {date:"20/03",name:"Uber TRIP",cat:"Transporte",value:23.94,fatura:"mar",cartao:"2040"},
-      {date:"08/03",name:"Barraca de Feira",cat:"Alimentação",value:23.0,fatura:"mar",cartao:"1518"},
-      {date:"28/03",name:"Point do Cambuci",cat:"Alimentação",value:22.0,fatura:"abr",cartao:"2040"},
-      {date:"21/03",name:"Boa Hora",cat:"Alimentação",value:21.46,fatura:"mar",cartao:"2040"},
-      {date:"15/03",name:"MP *BancaPaulinho",cat:"Alimentação",value:20.0,fatura:"mar",cartao:"2040"},
-      {date:"15/03",name:"RosaNagamineKinjo",cat:"Alimentação",value:20.0,fatura:"mar",cartao:"2040"},
-      {date:"26/02",name:"Uber TRIP",cat:"Transporte",value:19.94,fatura:"mar",cartao:"2040"},
-      {date:"12/03",name:"Shopee *Virtualfest",cat:"Compras Online",value:18.9,fatura:"mar",cartao:"0904"},
-      {date:"01/03",name:"Drogaria Sao Paulo 077",cat:"Saúde",value:18.59,fatura:"mar",cartao:"2040"},
-      {date:"29/03",name:"Feiras",cat:"Alimentação",value:18.0,fatura:"abr",cartao:"1518"},
-      {date:"11/04",name:"Espetinho Lion",cat:"Alimentação",value:18.0,fatura:"abr",cartao:"1518"},
-      {date:"09/03",name:"Uber TRIP",cat:"Transporte",value:17.95,fatura:"mar",cartao:"2040"},
-      {date:"02/04",name:"Atacadao 680AS",cat:"Alimentação",value:17.33,fatura:"abr",cartao:"1518"},
-      {date:"08/03",name:"Sandra M Feitoza",cat:"Alimentação",value:17.0,fatura:"mar",cartao:"1518"},
-      {date:"12/03",name:"Uber TRIP",cat:"Transporte",value:16.97,fatura:"mar",cartao:"2040"},
-      {date:"24/03",name:"Vend Perto Machines",cat:"Alimentação",value:15.95,fatura:"mar",cartao:"2040"},
-      {date:"20/04",name:"Mundo do Cabeleireiro",cat:"Diversos",value:15.48,fatura:"abr",cartao:"2040"},
-      {date:"29/03",name:"Rnme",cat:"Diversos",value:15.0,fatura:"abr",cartao:"1518"},
-      {date:"22/02",name:"Padoka A Favorita",cat:"Alimentação",value:15.0,fatura:"mar",cartao:"2040"},
-      {date:"22/03",name:"RosaNagamineKinjo",cat:"Alimentação",value:15.0,fatura:"mar",cartao:"2040"},
-      {date:"22/03",name:"MP *ComerciodefRu",cat:"Alimentação",value:15.0,fatura:"mar",cartao:"2040"},
-      {date:"04/03",name:"MP *Flavio2007",cat:"Alimentação",value:14.0,fatura:"mar",cartao:"2040"},
-      {date:"18/04",name:"MatheusJesusSilva",cat:"Alimentação",value:13.0,fatura:"abr",cartao:"1518"},
-      {date:"20/03",name:"Uber TRIP",cat:"Transporte",value:12.95,fatura:"mar",cartao:"2040"},
-      {date:"02/04",name:"Mercearia Jacyara Ltda",cat:"Alimentação",value:12.5,fatura:"abr",cartao:"1518"},
-      {date:"15/03",name:"Roberto Issamu Gushike",cat:"Alimentação",value:12.5,fatura:"mar",cartao:"2040"},
-      {date:"03/03",name:"MP *Flavio2007",cat:"Alimentação",value:12.0,fatura:"mar",cartao:"2040"},
-      {date:"26/04",name:"MP *Adegarr",cat:"Alimentação",value:12.0,fatura:"mar",cartao:"2040"},
-      {date:"07/04",name:"PostoDeRevendaDe",cat:"Transporte",value:11.99,fatura:"abr",cartao:"1518"},
-      {date:"05/03",name:"PostoDeRevendaDe",cat:"Transporte",value:11.99,fatura:"mar",cartao:"1518"},
-      {date:"16/03",name:"PostoDeRevendaDe",cat:"Transporte",value:11.99,fatura:"mar",cartao:"1518"},
-      {date:"27/03",name:"Vend Perto Machines",cat:"Alimentação",value:11.96,fatura:"abr",cartao:"1518"},
-      {date:"03/04",name:"Vend Perto Machines",cat:"Alimentação",value:11.94,fatura:"abr",cartao:"2040"},
-      {date:"12/03",name:"Uber TRIP",cat:"Transporte",value:11.94,fatura:"mar",cartao:"2040"},
-      {date:"14/03",name:"Dia Brasil LJ 91",cat:"Alimentação",value:11.5,fatura:"mar",cartao:"1518"},
-      {date:"20/03",name:"Vend Perto Machines",cat:"Alimentação",value:10.98,fatura:"mar",cartao:"2040"},
-      {date:"28/03",name:"Espetinho Lion",cat:"Alimentação",value:10.0,fatura:"abr",cartao:"1518"},
-      {date:"08/03",name:"MP *Legumes",cat:"Alimentação",value:10.0,fatura:"mar",cartao:"2040"},
-      {date:"10/03",name:"MP *Flavio2007",cat:"Alimentação",value:10.0,fatura:"mar",cartao:"2040"},
-      {date:"28/02",name:"SaborDeMel",cat:"Alimentação",value:10.0,fatura:"mar",cartao:"1518"},
-      {date:"15/03",name:"Barraca do Henrique",cat:"Alimentação",value:10.0,fatura:"mar",cartao:"1518"},
-      {date:"01/03",name:"Vend Perto Machines",cat:"Alimentação",value:9.98,fatura:"mar",cartao:"1518"},
-      {date:"25/02",name:"Vend Perto Machines",cat:"Alimentação",value:8.99,fatura:"mar",cartao:"1518"},
-      {date:"26/04",name:"Mercado Alianca",cat:"Alimentação",value:8.51,fatura:"mar",cartao:"2040"},
-      {date:"24/02",name:"MP *Flavio2007",cat:"Alimentação",value:8.0,fatura:"mar",cartao:"1518"},
-      {date:"08/03",name:"AdailtonAvelino",cat:"Diversos",value:8.0,fatura:"mar",cartao:"1518"},
-      {date:"26/03",name:"Rainha do Derby Padari",cat:"Alimentação",value:7.79,fatura:"abr",cartao:"2040"},
-      {date:"04/04",name:"Obramax Atacado de Con",cat:"Moradia",value:7.5,fatura:"abr",cartao:"2040"},
-      {date:"23/02",name:"Vend Perto Machines",cat:"Alimentação",value:6.72,fatura:"mar",cartao:"2040"},
-      {date:"29/03",name:"MP *ComerciodefRu",cat:"Alimentação",value:6.0,fatura:"abr",cartao:"1518"},
-      {date:"20/03",name:"FVW Vending Comerci",cat:"Alimentação",value:5.25,fatura:"mar",cartao:"1518"},
-      {date:"29/03",name:"MP *BancaPaulinho",cat:"Alimentação",value:5.0,fatura:"abr",cartao:"1518"},
-      {date:"29/03",name:"AntonioCarlosOliv",cat:"Alimentação",value:5.0,fatura:"abr",cartao:"1518"},
-      {date:"08/03",name:"SESC Ipiranga",cat:"Lazer",value:5.0,fatura:"mar",cartao:"2040"},
-      {date:"22/03",name:"DanielaYukieOgiso",cat:"Alimentação",value:5.0,fatura:"mar",cartao:"2040"},
-      {date:"06/04",name:"FVW Vending Comerci",cat:"Alimentação",value:4.5,fatura:"abr",cartao:"1518"},
-      {date:"29/03",name:"AdailtonAvelino",cat:"Diversos",value:4.0,fatura:"abr",cartao:"1518"},
-      {date:"08/03",name:"SandraSayuriIwaki",cat:"Diversos",value:4.0,fatura:"mar",cartao:"1518"},
-      {date:"27/04",name:"Maiconlourencode",cat:"Alimentação",value:2.0,fatura:"mar",cartao:"2040"}
-    ]
-  },
-  {
-    id: "batch_estornos",
-    label: "🔄 Estornos e ajustes (fatura oficial)",
-    date: "24/04/2026",
-    source: "PDF Itaú",
-    faturas: ["mar","abr"],
-    rows: [
-      {date:"07/03",name:"RAIA2580 (ajuste)",cat:"Saúde",value:-0.02,fatura:"abr",cartao:"2040"},
-      {date:"21/03",name:"Drogaria Online (ajuste)",cat:"Saúde",value:-0.01,fatura:"abr",cartao:"2040"},
-      {date:"09/03",name:"AmazonMktplc*InterCome (ajuste)",cat:"Compras Online",value:-0.04,fatura:"abr",cartao:"0904"},
-      {date:"16/02",name:"RD Saude (ajuste)",cat:"Saúde",value:-0.01,fatura:"mar",cartao:"2040"}
-    ]
-  },
-  {
-    id: "batch_mai2026",
-    label: "🔴 Fatura Maio/26 — em aberto",
-    date: "27/04/2026",
-    source: "App Itaú",
-    faturas: ["mai"],
-    rows: [
-      {date:"27/04",name:"Raia Drogasil SA",cat:"Saúde",value:102.99,fatura:"mai",cartao:"2040"},
-      {date:"27/04",name:"Maiconlourencode",cat:"Alimentação",value:2.00,fatura:"mai",cartao:"2040"},
-      {date:"26/04",name:"Shein *shein.com",cat:"Vestuário",value:41.39,fatura:"mai",cartao:"2040"},
-      {date:"26/04",name:"Apple.com/Bill",cat:"Entretenimento",value:35.00,fatura:"mai",cartao:"2040"},
-      {date:"26/04",name:"MP *Adegarr",cat:"Alimentação",value:12.00,fatura:"mai",cartao:"2040"},
-      {date:"26/04",name:"Mercado Alianca",cat:"Alimentação",value:8.51,fatura:"mai",cartao:"2040"},
-      {date:"25/04",name:"Anuidade Diferenciada",cat:"Anuidade",value:60.00,fatura:"mai",cartao:"serv",parcela:"11/12"},
-      {date:"11/04",name:"Loja Bebe Urbano",cat:"Vestuário",value:40.00,fatura:"mai",cartao:"2040",parcela:"02/03"},
-      {date:"13/04",name:"RD Saude Online",cat:"Saúde",value:93.02,fatura:"mai",cartao:"2040",parcela:"02/02"},
-      {date:"09/04",name:"Pague Menos A11",cat:"Saúde",value:99.98,fatura:"mai",cartao:"2040",parcela:"02/02"},
-      {date:"07/03",name:"RAIA2580",cat:"Saúde",value:69.56,fatura:"mai",cartao:"2040",parcela:"03/03"},
-      {date:"10/01",name:"Leitura",cat:"Educação",value:74.81,fatura:"mai",cartao:"1518",parcela:"05/05"},
-      {date:"22/12",name:"Amazon BR - iPhone 16",cat:"Hobby",value:438.83,fatura:"mai",cartao:"0904",parcela:"06/12"},
-      {date:"09/03",name:"AmazonMktplc*Inter",cat:"Compras Online",value:57.51,fatura:"mai",cartao:"0904",parcela:"03/03"}
-    ]
-  }
+  // ═══════════════════════════════════════════════════════
+  // FATURA ABRIL/2026 · Total: R$3.188,37
+  // Fechamento: 24/04/2026 · Venc: 01/05/2026 · PAGA
+  // ═══════════════════════════════════════════════════════
+
+  // Giovanna (final 2040) — subtotal R$1.088,26
+  {date:"24/02",name:"RD Saude",               cat:"Saúde",          value:96.22,  fatura:"abr",cartao:"2040",parcela:"02/02"},
+  {date:"07/03",name:"RAIA2580",               cat:"Saúde",          value:69.56,  fatura:"abr",cartao:"2040",parcela:"02/03"},
+  {date:"07/03",name:"RAIA2580 (ajuste)",      cat:"Saúde",          value:-0.02,  fatura:"abr",cartao:"2040"},
+  {date:"21/03",name:"Drogaria Online",        cat:"Saúde",          value:62.39,  fatura:"abr",cartao:"2040",parcela:"02/02"},
+  {date:"21/03",name:"Drogaria Online (ajuste)",cat:"Saúde",         value:-0.01,  fatura:"abr",cartao:"2040"},
+  {date:"25/03",name:"Uber TRIP",              cat:"Transporte",     value:35.95,  fatura:"abr",cartao:"2040"},
+  {date:"26/03",name:"AppleCom/Bill",          cat:"Entretenimento", value:35.00,  fatura:"abr",cartao:"2040"},
+  {date:"26/03",name:"RD Saude Online",        cat:"Saúde",          value:65.84,  fatura:"abr",cartao:"2040",parcela:"01/02"},
+  {date:"26/03",name:"Rainha do Derby Padari", cat:"Alimentação",    value:7.79,   fatura:"abr",cartao:"2040"},
+  {date:"26/03",name:"Uber TRIP",              cat:"Transporte",     value:38.98,  fatura:"abr",cartao:"2040"},
+  {date:"28/03",name:"Point do Cambuci",       cat:"Alimentação",    value:22.00,  fatura:"abr",cartao:"2040"},
+  {date:"02/04",name:"Raia Drogasil SA",       cat:"Saúde",          value:120.53, fatura:"abr",cartao:"2040"},
+  {date:"03/04",name:"Vend Perto Machines",    cat:"Alimentação",    value:11.94,  fatura:"abr",cartao:"2040"},
+  {date:"04/04",name:"Obramax Atacado de Con", cat:"Moradia",        value:7.50,   fatura:"abr",cartao:"2040"},
+  {date:"09/04",name:"Pague Menos A11",        cat:"Saúde",          value:99.98,  fatura:"abr",cartao:"2040",parcela:"01/02"},
+  {date:"11/04",name:"STB*Pavao Penha",        cat:"Diversos",       value:40.00,  fatura:"abr",cartao:"2040"},
+  {date:"11/04",name:"Loja Bebe Urbano",       cat:"Vestuário",      value:40.00,  fatura:"abr",cartao:"2040",parcela:"01/03"},
+  {date:"11/04",name:"Pague Menos",            cat:"Saúde",          value:51.52,  fatura:"abr",cartao:"2040",parcela:"02/02"},
+  {date:"12/04",name:"TagItau*GiovannaRocha",  cat:"Transporte",     value:50.00,  fatura:"abr",cartao:"2040"},
+  {date:"13/04",name:"RD Saude Online",        cat:"Saúde",          value:93.02,  fatura:"abr",cartao:"2040",parcela:"01/02"},
+  {date:"15/04",name:"Dietitian",              cat:"Saúde",          value:44.90,  fatura:"abr",cartao:"2040"},
+  {date:"19/04",name:"DUD - Dutra Drive",      cat:"Alimentação",    value:34.80,  fatura:"abr",cartao:"2040"},
+  {date:"20/04",name:"RAIA2975",               cat:"Saúde",          value:44.89,  fatura:"abr",cartao:"2040"},
+  {date:"20/04",name:"Mundo do Cabeleireiro",  cat:"Diversos",       value:15.48,  fatura:"abr",cartao:"2040"},
+
+  // Produtos/Serviços 2040 — líquido R$30,00 (não integra subtotal do cartão)
+  {date:"26/03",name:"Anuidade Diferenciada",  cat:"Anuidade",       value:60.00,  fatura:"abr",cartao:"serv",parcela:"10/12"},
+  {date:"24/04",name:"Estorno Anuidade Dif",   cat:"Anuidade",       value:-30.00, fatura:"abr",cartao:"serv"},
+
+  // Nikholas (final 1518) — subtotal R$1.327,87
+  {date:"10/01",name:"Leitura",                cat:"Educação",       value:74.81,  fatura:"abr",cartao:"1518",parcela:"04/05"},
+  {date:"26/03",name:"Joanin",                 cat:"Alimentação",    value:92.71,  fatura:"abr",cartao:"1518"},
+  {date:"27/03",name:"Vend Perto Machines",    cat:"Alimentação",    value:11.96,  fatura:"abr",cartao:"1518"},
+  {date:"28/03",name:"Espetinho Lion",         cat:"Alimentação",    value:10.00,  fatura:"abr",cartao:"1518"},
+  {date:"29/03",name:"MP *BancaPaulinho",      cat:"Alimentação",    value:5.00,   fatura:"abr",cartao:"1518"},
+  {date:"29/03",name:"Katia Monteiro da Sil",  cat:"Diversos",       value:30.00,  fatura:"abr",cartao:"1518"},
+  {date:"29/03",name:"AntonioCarlosOliv",      cat:"Alimentação",    value:5.00,   fatura:"abr",cartao:"1518"},
+  {date:"29/03",name:"PostoDeRevendaDe",       cat:"Transporte",     value:36.96,  fatura:"abr",cartao:"1518"},
+  {date:"29/03",name:"Rnme",                   cat:"Diversos",       value:15.00,  fatura:"abr",cartao:"1518"},
+  {date:"29/03",name:"AdailtonAvelino",        cat:"Diversos",       value:4.00,   fatura:"abr",cartao:"1518"},
+  {date:"29/03",name:"MP *ComerciodefRu",      cat:"Alimentação",    value:6.00,   fatura:"abr",cartao:"1518"},
+  {date:"29/03",name:"Feiras",                 cat:"Alimentação",    value:18.00,  fatura:"abr",cartao:"1518"},
+  {date:"02/04",name:"Mercearia Jacyara Ltda", cat:"Alimentação",    value:12.50,  fatura:"abr",cartao:"1518"},
+  {date:"02/04",name:"Niko Lanchonete",        cat:"Alimentação",    value:29.90,  fatura:"abr",cartao:"1518"},
+  {date:"02/04",name:"Atacadao 680AS",         cat:"Alimentação",    value:17.33,  fatura:"abr",cartao:"1518"},
+  {date:"02/04",name:"Petz Mooca",             cat:"Pet",            value:210.00, fatura:"abr",cartao:"1518"},
+  {date:"04/04",name:"Boa Hora",               cat:"Alimentação",    value:31.67,  fatura:"abr",cartao:"1518"},
+  {date:"05/04",name:"RAIA2082",               cat:"Saúde",          value:29.14,  fatura:"abr",cartao:"1518"},
+  {date:"05/04",name:"AutoPostoKanTan",        cat:"Transporte",     value:186.62, fatura:"abr",cartao:"1518"},
+  {date:"05/04",name:"Atacadao 680AS",         cat:"Alimentação",    value:40.80,  fatura:"abr",cartao:"1518"},
+  {date:"06/04",name:"FVW Vending Comerci",    cat:"Alimentação",    value:4.50,   fatura:"abr",cartao:"1518"},
+  {date:"06/04",name:"Joanin",                 cat:"Alimentação",    value:52.95,  fatura:"abr",cartao:"1518"},
+  {date:"07/04",name:"PostoDeRevendaDe",       cat:"Transporte",     value:11.99,  fatura:"abr",cartao:"1518"},
+  {date:"11/04",name:"Espetinho Lion",         cat:"Alimentação",    value:18.00,  fatura:"abr",cartao:"1518"},
+  {date:"11/04",name:"Kee*Maisa Santos Sil",   cat:"Alimentação",    value:45.26,  fatura:"abr",cartao:"1518"},
+  {date:"18/04",name:"MatheusJesusSilva",      cat:"Alimentação",    value:13.00,  fatura:"abr",cartao:"1518"},
+  {date:"19/04",name:"Apple.com/Bill",         cat:"Entretenimento", value:99.90,  fatura:"abr",cartao:"1518"},
+  {date:"19/04",name:"Posto Carreteiro 2",     cat:"Transporte",     value:177.87, fatura:"abr",cartao:"1518"},
+  {date:"22/04",name:"Espetinho Lion",         cat:"Alimentação",    value:37.00,  fatura:"abr",cartao:"1518"},
+
+  // Giovanna (final 0904) — subtotal R$742,24
+  {date:"27/06",name:"EstudioMater",           cat:"Educação",       value:129.90, fatura:"abr",cartao:"0904",parcela:"10/10"},
+  {date:"22/12",name:"Amazon BR",              cat:"Educação",       value:438.83, fatura:"abr",cartao:"0904",parcela:"05/12"},
+  {date:"09/03",name:"AmazonMktplc*Inter",     cat:"Compras Online", value:57.51,  fatura:"abr",cartao:"0904",parcela:"02/03"},
+  {date:"09/03",name:"AmazonMktplc*InterCome", cat:"Compras Online", value:-0.04,  fatura:"abr",cartao:"0904"},
+  {date:"30/03",name:"EBN*Spotify",            cat:"Entretenimento", value:40.90,  fatura:"abr",cartao:"0904"},
+  {date:"13/04",name:"Shopee *HCarBrindeSImp", cat:"Compras Online", value:75.14,  fatura:"abr",cartao:"0904"},
+
+
+  // ═══════════════════════════════════════════════════════
+  // FATURA MARÇO/2026 · Total: R$3.940,79
+  // Fechamento: 25/03/2026 · Venc: 01/04/2026 · PAGA
+  // ═══════════════════════════════════════════════════════
+
+  // Giovanna (final 2040) — subtotal R$1.744,21
+  {date:"28/12",name:"Raia Drogasil SA",       cat:"Saúde",          value:96.37,  fatura:"mar",cartao:"2040",parcela:"03/03"},
+  {date:"28/01",name:"RD Saude",               cat:"Saúde",          value:80.91,  fatura:"mar",cartao:"2040",parcela:"02/02"},
+  {date:"06/02",name:"Riachuelo 232",          cat:"Vestuário",      value:134.98, fatura:"mar",cartao:"2040",parcela:"02/02"},
+  {date:"16/02",name:"RD Saude",               cat:"Saúde",          value:60.90,  fatura:"mar",cartao:"2040",parcela:"02/02"},
+  {date:"22/02",name:"Padoka A Favorita",      cat:"Alimentação",    value:15.00,  fatura:"mar",cartao:"2040"},
+  {date:"22/02",name:"Emporio Villa Verde",    cat:"Alimentação",    value:26.60,  fatura:"mar",cartao:"2040"},
+  {date:"23/02",name:"Vend Perto Machines",    cat:"Alimentação",    value:6.72,   fatura:"mar",cartao:"2040"},
+  {date:"24/02",name:"RD Saude",               cat:"Saúde",          value:96.22,  fatura:"mar",cartao:"2040",parcela:"01/02"},
+  {date:"26/02",name:"AppleCom/Bill",          cat:"Entretenimento", value:35.00,  fatura:"mar",cartao:"2040"},
+  {date:"26/02",name:"Uber TRIP",              cat:"Transporte",     value:19.94,  fatura:"mar",cartao:"2040"},
+  {date:"27/02",name:"Pastelaria O-CT WA",     cat:"Alimentação",    value:33.00,  fatura:"mar",cartao:"2040"},
+  {date:"01/03",name:"Drogaria Sao Paulo 077", cat:"Saúde",          value:18.59,  fatura:"mar",cartao:"2040"},
+  {date:"03/03",name:"MP *Flavio2007",         cat:"Alimentação",    value:12.00,  fatura:"mar",cartao:"2040"},
+  {date:"04/03",name:"MP *Flavio2007",         cat:"Alimentação",    value:14.00,  fatura:"mar",cartao:"2040"},
+  {date:"06/03",name:"KeetaBR*Carla Fernanda", cat:"Alimentação",    value:35.08,  fatura:"mar",cartao:"2040"},
+  {date:"07/03",name:"RAIA2580",               cat:"Saúde",          value:69.56,  fatura:"mar",cartao:"2040",parcela:"01/03"},
+  {date:"07/03",name:"Flora Agrotrevo",        cat:"Diversos",       value:66.00,  fatura:"mar",cartao:"2040"},
+  {date:"08/03",name:"SESC Ipiranga",          cat:"Lazer",          value:5.00,   fatura:"mar",cartao:"2040"},
+  {date:"08/03",name:"MP *Legumes",            cat:"Alimentação",    value:10.00,  fatura:"mar",cartao:"2040"},
+  {date:"09/03",name:"Uber TRIP",              cat:"Transporte",     value:17.95,  fatura:"mar",cartao:"2040"},
+  {date:"10/03",name:"MP *Flavio2007",         cat:"Alimentação",    value:10.00,  fatura:"mar",cartao:"2040"},
+  {date:"11/03",name:"Drogaria Online",        cat:"Saúde",          value:43.76,  fatura:"mar",cartao:"2040"},
+  {date:"12/03",name:"Uber TRIP",              cat:"Transporte",     value:11.94,  fatura:"mar",cartao:"2040"},
+  {date:"12/03",name:"Uber TRIP",              cat:"Transporte",     value:16.97,  fatura:"mar",cartao:"2040"},
+  {date:"12/03",name:"Atacadao 680AS",         cat:"Alimentação",    value:422.72, fatura:"mar",cartao:"2040"},
+  {date:"15/03",name:"MP *BancaPaulinho",      cat:"Alimentação",    value:20.00,  fatura:"mar",cartao:"2040"},
+  {date:"15/03",name:"Roberto Issamu Gushike", cat:"Alimentação",    value:12.50,  fatura:"mar",cartao:"2040"},
+  {date:"15/03",name:"RosaNagamineKinjo",      cat:"Alimentação",    value:20.00,  fatura:"mar",cartao:"2040"},
+  {date:"20/03",name:"Uber TRIP",              cat:"Transporte",     value:23.94,  fatura:"mar",cartao:"2040"},
+  {date:"20/03",name:"Uber TRIP",              cat:"Transporte",     value:12.95,  fatura:"mar",cartao:"2040"},
+  {date:"20/03",name:"Vend Perto Machines",    cat:"Alimentação",    value:10.98,  fatura:"mar",cartao:"2040"},
+  {date:"21/03",name:"Drogaria Online",        cat:"Saúde",          value:62.39,  fatura:"mar",cartao:"2040",parcela:"01/02"},
+  {date:"21/03",name:"Boa Hora",               cat:"Alimentação",    value:21.46,  fatura:"mar",cartao:"2040"},
+  {date:"22/03",name:"Drogasil1825",           cat:"Saúde",          value:149.84, fatura:"mar",cartao:"2040"},
+  {date:"22/03",name:"DanielaYukieOgiso",      cat:"Alimentação",    value:5.00,   fatura:"mar",cartao:"2040"},
+  {date:"22/03",name:"RosaNagamineKinjo",      cat:"Alimentação",    value:15.00,  fatura:"mar",cartao:"2040"},
+  {date:"22/03",name:"MP *ComerciodefRu",      cat:"Alimentação",    value:15.00,  fatura:"mar",cartao:"2040"},
+  {date:"24/03",name:"Vend Perto Machines",    cat:"Alimentação",    value:15.95,  fatura:"mar",cartao:"2040"},
+
+  // Produtos/Serviços 2040 — líquido R$30,00 (não integra subtotal do cartão)
+  {date:"23/02",name:"Anuidade Diferenciada",  cat:"Anuidade",       value:60.00,  fatura:"mar",cartao:"serv",parcela:"09/12"},
+  {date:"25/03",name:"Estorno Anuidade Dif",   cat:"Anuidade",       value:-30.00, fatura:"mar",cartao:"serv"},
+
+  // Nikholas (final 1518) — subtotal R$999,39
+  {date:"10/01",name:"Leitura",                cat:"Educação",       value:74.81,  fatura:"mar",cartao:"1518",parcela:"03/05"},
+  {date:"24/02",name:"MP *Flavio2007",         cat:"Alimentação",    value:8.00,   fatura:"mar",cartao:"1518"},
+  {date:"25/02",name:"Wellhub Nikholas Pifan", cat:"Saúde",          value:99.99,  fatura:"mar",cartao:"1518"},
+  {date:"25/02",name:"Vend Perto Machines",    cat:"Alimentação",    value:8.99,   fatura:"mar",cartao:"1518"},
+  {date:"26/02",name:"Keeta*62 990 032 MA",    cat:"Alimentação",    value:33.63,  fatura:"mar",cartao:"1518"},
+  {date:"28/02",name:"SaborDeMel",             cat:"Alimentação",    value:10.00,  fatura:"mar",cartao:"1518"},
+  {date:"28/02",name:"Drogaria Sao Paulo 618", cat:"Saúde",          value:53.60,  fatura:"mar",cartao:"1518"},
+  {date:"01/03",name:"Vend Perto Machines",    cat:"Alimentação",    value:9.98,   fatura:"mar",cartao:"1518"},
+  {date:"05/03",name:"PostoDeRevendaDe",       cat:"Transporte",     value:11.99,  fatura:"mar",cartao:"1518"},
+  {date:"05/03",name:"Atacadao 680AS",         cat:"Alimentação",    value:96.03,  fatura:"mar",cartao:"1518"},
+  {date:"07/03",name:"SESC Ipiranga",          cat:"Lazer",          value:32.50,  fatura:"mar",cartao:"1518"},
+  {date:"08/03",name:"Barraca de Feira",       cat:"Alimentação",    value:23.00,  fatura:"mar",cartao:"1518"},
+  {date:"08/03",name:"Sandra M Feitoza",       cat:"Alimentação",    value:17.00,  fatura:"mar",cartao:"1518"},
+  {date:"08/03",name:"AdailtonAvelino",        cat:"Diversos",       value:8.00,   fatura:"mar",cartao:"1518"},
+  {date:"08/03",name:"SandraSayuriIwaki",      cat:"Diversos",       value:4.00,   fatura:"mar",cartao:"1518"},
+  {date:"14/03",name:"MP *Estacionament",      cat:"Transporte",     value:55.00,  fatura:"mar",cartao:"1518"},
+  {date:"14/03",name:"Dia Brasil LJ 91",       cat:"Alimentação",    value:11.50,  fatura:"mar",cartao:"1518"},
+  {date:"14/03",name:"Supermercado Negreiros", cat:"Alimentação",    value:157.13, fatura:"mar",cartao:"1518"},
+  {date:"15/03",name:"Barraca do Henrique",    cat:"Alimentação",    value:10.00,  fatura:"mar",cartao:"1518"},
+  {date:"16/03",name:"PostoDeRevendaDe",       cat:"Transporte",     value:11.99,  fatura:"mar",cartao:"1518"},
+  {date:"16/03",name:"RAIA2580",               cat:"Saúde",          value:121.98, fatura:"mar",cartao:"1518"},
+  {date:"19/03",name:"AppleCom/Bill",          cat:"Entretenimento", value:99.90,  fatura:"mar",cartao:"1518"},
+  {date:"19/03",name:"Atacadao 680AS",         cat:"Alimentação",    value:35.12,  fatura:"mar",cartao:"1518"},
+  {date:"20/03",name:"FVW Vending Comerci",    cat:"Alimentação",    value:5.25,   fatura:"mar",cartao:"1518"},
+
+  // Giovanna (final 0904) — subtotal R$1.167,19
+  {date:"27/06",name:"EstudioMater",           cat:"Educação",       value:129.90, fatura:"mar",cartao:"0904",parcela:"09/10"},
+  {date:"26/11",name:"Shopee *Masterchai",     cat:"Compras Online", value:82.85,  fatura:"mar",cartao:"0904",parcela:"04/04"},
+  {date:"22/12",name:"Amazon BR",              cat:"Educação",       value:438.83, fatura:"mar",cartao:"0904",parcela:"04/12"},
+  {date:"28/01",name:"Shopee *BejinhoNo",      cat:"Vestuário",      value:104.90, fatura:"mar",cartao:"0904",parcela:"02/02"},
+  {date:"20/02",name:"AmazonMktplc*Leituraca", cat:"Educação",       value:59.90,  fatura:"mar",cartao:"0904"},
+  {date:"23/02",name:"Shopee *Sunrise",        cat:"Compras Online", value:39.00,  fatura:"mar",cartao:"0904"},
+  {date:"24/02",name:"Shopee *MiguelitoKids2", cat:"Vestuário",      value:35.90,  fatura:"mar",cartao:"0904"},
+  {date:"28/02",name:"EBN *Spotify",           cat:"Entretenimento", value:40.90,  fatura:"mar",cartao:"0904"},
+  {date:"04/03",name:"Shopee *Spotlight82",    cat:"Compras Online", value:86.10,  fatura:"mar",cartao:"0904"},
+  {date:"09/03",name:"AmazonMktplc*Inter",     cat:"Compras Online", value:57.51,  fatura:"mar",cartao:"0904",parcela:"01/03"},
+  {date:"12/03",name:"Shopee *Virtualfest",    cat:"Compras Online", value:18.90,  fatura:"mar",cartao:"0904"},
+  {date:"23/03",name:"MP *PetDonalds",         cat:"Pet",            value:72.50,  fatura:"mar",cartao:"0904"},
+
+
+  // ═══════════════════════════════════════════════════════
+  // FATURA MAIO/2026 · Em aberto · Fecha: 24/05/2026
+  // ═══════════════════════════════════════════════════════
+
+  // Novas compras (imagem 25–27/04)
+  {date:"27/04",name:"Raia Drogasil SA",       cat:"Saúde",          value:102.99, fatura:"mai",cartao:"2040"},
+  {date:"27/04",name:"Maiconlourencode",        cat:"Alimentação",    value:2.00,   fatura:"mai",cartao:"2040"},
+  {date:"26/04",name:"Shein *shein.com",        cat:"Vestuário",      value:41.39,  fatura:"mai",cartao:"2040"},
+  {date:"26/04",name:"Apple.com/Bill",          cat:"Entretenimento", value:35.00,  fatura:"mai",cartao:"2040"},
+  {date:"26/04",name:"MP *Adegarr",             cat:"Alimentação",    value:12.00,  fatura:"mai",cartao:"2040"},
+  {date:"26/04",name:"Mercado Alianca",         cat:"Alimentação",    value:8.51,   fatura:"mai",cartao:"2040"},
+  {date:"25/04",name:"Anuidade Diferenciada",   cat:"Anuidade",       value:60.00,  fatura:"mai",cartao:"2040",parcela:"11/12"},
+
+  // Parcelas de Abril que caem em Maio
+  {date:"11/04",name:"Loja Bebe Urbano",        cat:"Vestuário",      value:40.00,  fatura:"mai",cartao:"2040",parcela:"02/03"},
+  {date:"13/04",name:"RD Saude Online",         cat:"Saúde",          value:93.02,  fatura:"mai",cartao:"2040",parcela:"02/02"},
+  {date:"09/04",name:"Pague Menos A11",         cat:"Saúde",          value:99.98,  fatura:"mai",cartao:"2040",parcela:"02/02"},
+  {date:"07/03",name:"RAIA2580",                cat:"Saúde",          value:69.56,  fatura:"mai",cartao:"2040",parcela:"03/03"},
+  {date:"10/01",name:"Leitura",                 cat:"Educação",       value:74.81,  fatura:"mai",cartao:"1518",parcela:"05/05"},
+  {date:"22/12",name:"Amazon BR",               cat:"Educação",       value:438.83, fatura:"mai",cartao:"0904",parcela:"06/12"},
+  {date:"09/03",name:"AmazonMktplc*Inter",      cat:"Compras Online", value:57.51,  fatura:"mai",cartao:"0904",parcela:"03/03"},
 ];
-
-// Build allData from active batches
-let activeBatchIds = new Set(IMPORT_BATCHES.map(b => b.id));
-
-function buildAllData() {
-  const rows = [];
-  IMPORT_BATCHES.forEach(batch => {
-    if(activeBatchIds.has(batch.id)) {
-      batch.rows.forEach(r => rows.push({...r}));
-    }
-  });
-  return rows.map((r, i) => ({...r, _id: i}));
-}
-
-let allData = buildAllData();
-
-const TRANSACTIONS = allData; // legacy alias
 
 // =============================================
 // STATE
 // =============================================
+let allData = TRANSACTIONS.map((t, i) => ({...t, _id: i}));
 let currentFatura = 'all';
 let selectedCat = null;
 
@@ -2152,8 +2012,7 @@ function switchTab(tab) {
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
   if(tab === 'sheet') renderSheet();
-  if(tab === 'imports') renderImportHistory();
-  if(tab === 'dash') renderCharts();
+  if(tab === 'dash') renderCharts(); // re-render charts after tab switch
 }
 
 // =============================================
@@ -2409,210 +2268,6 @@ function sheetApplyToDash() {
 }
 
 // =============================================
-// IMPORT HISTORY ENGINE
-// =============================================
-
-const BATCH_COLORS = [
-  '#C8843A','#7A8C5E','#8B7BAD','#D95F5F','#6BAAAA','#E07B3C','#9A8870','#C06080'
-];
-
-function getBatchColor(idx) {
-  return BATCH_COLORS[idx % BATCH_COLORS.length];
-}
-
-function rebuildAllDataFromBatches() {
-  allData = buildAllData();
-  sheetSync();
-  renderAll();
-  renderImportHistory();
-}
-
-function toggleBatch(batchId) {
-  if(activeBatchIds.has(batchId)) activeBatchIds.delete(batchId);
-  else activeBatchIds.add(batchId);
-  rebuildAllDataFromBatches();
-  showToast(activeBatchIds.has(batchId) ? '✅ Remessa ativada' : '⏸️ Remessa desativada');
-}
-
-function deleteBatch(batchId) {
-  const batch = IMPORT_BATCHES.find(b => b.id === batchId);
-  if(!batch) return;
-  const msg = document.getElementById('del-confirm-msg');
-  msg.textContent = `Excluir "${batch.label}"? Isso remove ${batch.rows.length} transações permanentemente.`;
-  document.getElementById('del-confirm').classList.add('open');
-  // Store pending delete
-  document.getElementById('del-confirm').dataset.pendingBatch = batchId;
-}
-
-// Override sheetConfirmDelete to also handle batch deletes
-const _origConfirmDelete = typeof sheetConfirmDelete === 'function' ? sheetConfirmDelete : null;
-function sheetConfirmDelete() {
-  const pendingBatch = document.getElementById('del-confirm').dataset.pendingBatch;
-  if(pendingBatch) {
-    delete document.getElementById('del-confirm').dataset.pendingBatch;
-    const idx = IMPORT_BATCHES.findIndex(b => b.id === pendingBatch);
-    if(idx !== -1) {
-      const removed = IMPORT_BATCHES.splice(idx, 1)[0];
-      activeBatchIds.delete(removed.id);
-      document.getElementById('del-confirm').classList.remove('open');
-      rebuildAllDataFromBatches();
-      showToast(`🗑️ Remessa "${removed.label}" excluída`);
-    }
-    return;
-  }
-  // Original sheet row delete
-  sheetData = sheetData.filter(t => !sheetSelected.has(t._id));
-  sheetSelected.clear();
-  document.getElementById('del-confirm').classList.remove('open');
-  setSyncBadge(true);
-  renderSheet();
-}
-
-function renameBatch(batchId) {
-  const batch = IMPORT_BATCHES.find(b => b.id === batchId);
-  if(!batch) return;
-  const newLabel = prompt('Novo nome para a remessa:', batch.label);
-  if(newLabel && newLabel.trim()) {
-    batch.label = newLabel.trim();
-    renderImportHistory();
-    showToast('✏️ Remessa renomeada');
-  }
-}
-
-function renderImportHistory() {
-  const grid = document.getElementById('import-history-grid');
-  if(!grid) return;
-
-  grid.innerHTML = IMPORT_BATCHES.map((batch, idx) => {
-    const isActive = activeBatchIds.has(batch.id);
-    const rowCount = batch.rows.filter(r => r.value > 0).length;
-    const total = batch.rows.reduce((s,r) => s + (r.value||0), 0);
-    const faturas = [...new Set(batch.rows.map(r => r.fatura))];
-    const color = getBatchColor(idx);
-    const faturaLabels = {mar:'Março/26', abr:'Abril/26', mai:'Maio/26 🔴'};
-
-    return `
-    <div class="import-card ${isActive?'':'disabled'}" style="--accent:${color}">
-      <div class="import-card-header">
-        <div class="import-card-label">${batch.label}</div>
-        <button class="import-card-toggle ${isActive?'on':''}" onclick="toggleBatch('${batch.id}')" title="${isActive?'Desativar':'Ativar'} remessa"></button>
-      </div>
-      <div class="import-card-meta">
-        <span>📅 ${batch.date}</span>
-        <span>🔖 ${batch.source}</span>
-        <span>${isActive ? '✅ Ativa' : '⏸️ Pausada'}</span>
-      </div>
-      <div class="import-card-stats">
-        <span class="import-stat">${rowCount} transações</span>
-        <span class="import-stat highlight">${fmt(total)}</span>
-        ${faturas.map(f => `<span class="import-stat">${faturaLabels[f]||f}</span>`).join('')}
-      </div>
-      <div class="import-card-actions">
-        <button class="import-rename-btn" onclick="renameBatch('${batch.id}')">✏️ Renomear</button>
-        <button class="import-del-btn" onclick="deleteBatch('${batch.id}')">🗑️ Excluir</button>
-      </div>
-    </div>`;
-  }).join('');
-
-  // Summary stats
-  const summaryEl = document.getElementById('import-summary-stats');
-  if(summaryEl) {
-    const activeRows = allData.filter(t => t.value > 0);
-    const totalActive = allData.reduce((s,t) => s+(t.value||0), 0);
-    const byFatura = {};
-    allData.forEach(t => {
-      byFatura[t.fatura] = (byFatura[t.fatura]||0) + (t.value||0);
-    });
-    const fatLabels = {mar:'Março/26', abr:'Abril/26', mai:'Maio/26'};
-
-    summaryEl.innerHTML = [
-      `<div class="import-stat highlight" style="padding:10px 14px; font-size:0.82rem">
-        <div style="font-size:0.7rem; margin-bottom:2px">Remessas ativas</div>
-        <strong>${activeBatchIds.size} de ${IMPORT_BATCHES.length}</strong>
-      </div>`,
-      `<div class="import-stat" style="padding:10px 14px; font-size:0.82rem">
-        <div style="font-size:0.7rem; margin-bottom:2px">Total transações</div>
-        <strong>${activeRows.length}</strong>
-      </div>`,
-      ...Object.entries(byFatura).sort().map(([f,v]) => `
-        <div class="import-stat" style="padding:10px 14px; font-size:0.82rem">
-          <div style="font-size:0.7rem; margin-bottom:2px">${fatLabels[f]||f}</div>
-          <strong>${fmt(v)}</strong>
-        </div>`),
-    ].join('');
-  }
-}
-
-// Wire new import to create a batch
-function importFile(event) {
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const wb = XLSX.read(e.target.result, {type:'binary'});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const data = XLSX.utils.sheet_to_json(ws);
-      if(data.length === 0) { alert('Arquivo vazio ou formato inválido.'); return; }
-
-      const faturaMap = {
-        'abril/2026':'abr','abril/26':'abr','abr':'abr','abril':'abr',
-        'março/2026':'mar','março/26':'mar','mar':'mar','março':'mar',
-        'maio/2026':'mai','maio/26':'mai','mai':'mai','maio':'mai',
-      };
-      const cartaoMap = (s) => String(s||'').replace(/[•\.\s]/g,'').replace(/^+/,'') || '2040';
-
-      const mapped = data.map(row => {
-        const fatRaw = String(row['Fatura']||row['fatura']||'').toLowerCase().trim();
-        const fatura = faturaMap[fatRaw] || fatRaw.slice(0,3) || 'mai';
-        const cartaoRaw = String(row['Cartão']||row['Cartao']||row['cartao']||'2040');
-        const cartao = cartaoRaw.replace(/[•\.\s]/g,'').replace(/^\++/,'') || '2040';
-        const parcela = String(row['Parcela']||row['parcela']||'').trim();
-        return {
-          date:    String(row['Data']||row['date']||'').trim(),
-          name:    String(row['Estabelecimento']||row['name']||row['Nome']||'').trim(),
-          cat:     String(row['Categoria']||row['cat']||'Outros').trim(),
-          value:   parseFloat(row['Valor']||row['value']||0),
-          fatura,
-          cartao,
-          parcela: parcela && parcela !== '-' ? parcela : null,
-        };
-      }).filter(t => t.name && !isNaN(t.value));
-
-      if(mapped.length === 0) {
-        alert('Nenhuma transação válida. Colunas esperadas: Data, Estabelecimento, Categoria, Valor, Fatura, Cartão, Parcela');
-        return;
-      }
-
-      const now = new Date();
-      const dateStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
-      const batchId = 'batch_' + Date.now();
-      const faturas = [...new Set(mapped.map(r => r.fatura))];
-      const fatLabels = {mar:'Março/26', abr:'Abril/26', mai:'Maio/26'};
-
-      const newBatch = {
-        id: batchId,
-        label: `📂 ${file.name.replace(/\.[^.]+$/,'')} (${dateStr})`,
-        date: dateStr,
-        source: file.name,
-        faturas,
-        rows: mapped,
-      };
-
-      IMPORT_BATCHES.push(newBatch);
-      activeBatchIds.add(batchId);
-      rebuildAllDataFromBatches();
-      switchTab('imports');
-      showToast(`✅ ${mapped.length} transações importadas em nova remessa`);
-    } catch(err) {
-      alert('Erro ao processar arquivo: ' + err.message);
-    }
-  };
-  reader.readAsBinaryString(file);
-  event.target.value = '';
-}
-
-// =============================================
 // RENDER ALL
 // =============================================
 function renderAll() {
@@ -2625,8 +2280,7 @@ function renderAll() {
 
 // Init
 renderAll();
-renderImportHistory();
-sheetSync();
+sheetSync(); // initialize sheet mirror
 </script>
 
 </body>
