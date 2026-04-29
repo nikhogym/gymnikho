@@ -643,6 +643,211 @@ text-align: center;
 padding: 8px;
 }
 
+/* ===== TABS ===== */
+.tabs-bar {
+display: flex;
+gap: 4px;
+padding: 0 40px;
+background: #3D2410;
+border-bottom: none;
+}
+.tab-btn {
+padding: 12px 24px;
+font-family: inherit;
+font-size: 0.88rem;
+font-weight: 600;
+cursor: pointer;
+border: none;
+border-radius: 10px 10px 0 0;
+background: rgba(255,255,255,0.08);
+color: rgba(255,255,255,0.6);
+transition: all 0.18s;
+display: flex; align-items: center; gap: 7px;
+}
+.tab-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+.tab-btn.active { background: #FAF8F5; color: #4A2E18; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ===== SPREADSHEET ===== */
+.sheet-toolbar {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 16px 0 14px;
+flex-wrap: wrap;
+}
+.sheet-toolbar .btn-sheet {
+display: flex; align-items: center; gap: 6px;
+padding: 9px 16px;
+border-radius: 10px;
+border: 1.5px solid #EDE8E0;
+background: white;
+font-family: inherit;
+font-size: 0.82rem;
+font-weight: 600;
+cursor: pointer;
+color: #4A2E18;
+transition: all 0.15s;
+}
+.btn-sheet:hover { border-color: #C8843A; color: #C8843A; background: #FDF3E7; }
+.btn-sheet.primary { background: #7B4F2E; color: white; border-color: #7B4F2E; }
+.btn-sheet.primary:hover { background: #C8843A; border-color: #C8843A; }
+.btn-sheet.danger { border-color: #D95F5F; color: #D95F5F; }
+.btn-sheet.danger:hover { background: #FEF0F0; }
+.sheet-search {
+margin-left: auto;
+padding: 9px 14px;
+border: 1.5px solid #EDE8E0;
+border-radius: 10px;
+font-family: inherit;
+font-size: 0.82rem;
+background: white;
+color: #2C1E0F;
+outline: none;
+width: 220px;
+transition: border-color 0.15s;
+}
+.sheet-search:focus { border-color: #C8843A; }
+.sheet-sync-badge {
+font-size: 0.75rem;
+padding: 4px 12px;
+border-radius: 20px;
+background: #F0F4E8;
+color: #7A8C5E;
+font-weight: 600;
+}
+.sheet-sync-badge.dirty { background: #FDF3E7; color: #C8843A; }
+
+.sheet-wrap {
+background: white;
+border-radius: 16px;
+border: 1.5px solid #EDE8E0;
+box-shadow: 0 4px 24px rgba(120,80,30,0.08);
+overflow: hidden;
+}
+.sheet-table-container {
+overflow-x: auto;
+overflow-y: auto;
+max-height: 60vh;
+}
+.sheet-table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+.sheet-table-container::-webkit-scrollbar-thumb { background: #EDE8E0; border-radius: 4px; }
+
+table.sheet {
+width: 100%;
+border-collapse: collapse;
+font-size: 0.82rem;
+}
+table.sheet thead th {
+position: sticky; top: 0; z-index: 2;
+background: #4A2E18;
+color: white;
+padding: 11px 12px;
+text-align: left;
+font-weight: 600;
+font-size: 0.75rem;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+white-space: nowrap;
+border-right: 1px solid rgba(255,255,255,0.1);
+cursor: pointer;
+user-select: none;
+}
+table.sheet thead th:last-child { border-right: none; }
+table.sheet thead th.sorted-asc::after { content: ’ ↑’; opacity: 0.8; }
+table.sheet thead th.sorted-desc::after { content: ’ ↓’; opacity: 0.8; }
+table.sheet thead th.col-num { width: 36px; text-align: center; cursor: default; }
+table.sheet tbody tr { transition: background 0.12s; }
+table.sheet tbody tr:nth-child(even) { background: #FAF8F5; }
+table.sheet tbody tr:hover { background: #FDF3E7; }
+table.sheet tbody tr.selected { background: #FDF3E7 !important; outline: 2px solid #C8843A; outline-offset: -1px; }
+table.sheet tbody tr.new-row { background: #F0F7EC; }
+table.sheet tbody tr.new-row:hover { background: #E5F2DC; }
+table.sheet td {
+padding: 0;
+border-bottom: 1px solid #EDE8E0;
+border-right: 1px solid #EDE8E0;
+vertical-align: middle;
+}
+table.sheet td:last-child { border-right: none; }
+table.sheet td.col-num {
+width: 36px; text-align: center;
+color: #B0A090; font-size: 0.72rem;
+padding: 8px 4px;
+background: #F5F2EC !important;
+cursor: pointer;
+}
+table.sheet td.col-num:hover { background: #EDE8E0 !important; }
+
+/* Editable cell */
+.cell-input {
+width: 100%;
+padding: 8px 10px;
+border: none;
+background: transparent;
+font-family: inherit;
+font-size: 0.82rem;
+color: #2C1E0F;
+outline: none;
+min-width: 80px;
+}
+.cell-input:focus {
+background: #FFFDF5;
+box-shadow: inset 0 0 0 2px #C8843A;
+border-radius: 4px;
+}
+.cell-input.cell-value { text-align: right; font-variant-numeric: tabular-nums; }
+select.cell-input { cursor: pointer; padding-right: 4px; }
+
+/* Cat pill in sheet */
+.cat-pill {
+display: inline-block;
+padding: 2px 8px;
+border-radius: 10px;
+font-size: 0.72rem;
+font-weight: 600;
+color: white;
+pointer-events: none;
+}
+
+/* Sheet footer */
+.sheet-footer {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 10px 16px;
+background: #F5F2EC;
+border-top: 1.5px solid #EDE8E0;
+font-size: 0.78rem;
+color: #7A6A55;
+flex-wrap: wrap;
+gap: 8px;
+}
+.sheet-footer strong { color: #4A2E18; }
+
+/* Confirm delete dialog */
+.del-confirm {
+display: none;
+position: fixed; inset: 0;
+background: rgba(44,30,15,0.4);
+backdrop-filter: blur(4px);
+z-index: 2500;
+align-items: center; justify-content: center;
+}
+.del-confirm.open { display: flex; }
+.del-confirm-box {
+background: white;
+border-radius: 16px;
+padding: 28px 28px 22px;
+max-width: 360px; width: 90%;
+box-shadow: 0 16px 60px rgba(44,30,15,0.2);
+text-align: center;
+}
+.del-confirm-box h4 { font-size: 1rem; color: #4A2E18; margin-bottom: 8px; }
+.del-confirm-box p { font-size: 0.84rem; color: #7A6A55; margin-bottom: 20px; }
+.del-confirm-btns { display: flex; gap: 10px; justify-content: center; }
+
 /* ===== FOOTER ===== */
 footer {
 text-align: center;
@@ -698,7 +903,13 @@ header { padding: 18px 16px; flex-direction: column; align-items: flex-start; ga
   </div>
 </header>
 
+<div class="tabs-bar">
+  <button class="tab-btn active" id="tab-dash" onclick="switchTab('dash')">📊 Dashboard</button>
+  <button class="tab-btn" id="tab-sheet" onclick="switchTab('sheet')">📋 Planilha</button>
+</div>
+
 <main>
+<div class="tab-panel active" id="panel-dash">
 
   <!-- KPIs -->
 
@@ -770,6 +981,60 @@ header { padding: 18px 16px; flex-direction: column; align-items: flex-start; ga
   <div class="section-title">💡 Insights Automáticos</div>
   <div class="insights-grid" id="insights-grid"><!-- JS --></div>
 
+</div><!-- /panel-dash -->
+
+<!-- ═══════════════ PLANILHA ═══════════════ -->
+
+<div class="tab-panel" id="panel-sheet">
+
+  <div class="sheet-toolbar">
+    <button class="btn-sheet primary" onclick="sheetAddRow()">➕ Nova linha</button>
+    <button class="btn-sheet" onclick="sheetDeleteSelected()" id="btn-del-sel" style="display:none">🗑️ Excluir selecionadas</button>
+    <button class="btn-sheet" onclick="sheetDuplicateSelected()" id="btn-dup-sel" style="display:none">⧉ Duplicar</button>
+    <button class="btn-sheet primary" onclick="sheetApplyToDash()" id="btn-apply">🔄 Aplicar ao Dashboard</button>
+    <span class="sheet-sync-badge" id="sync-badge">✅ Sincronizado</span>
+    <input class="sheet-search" type="text" id="sheet-search" placeholder="🔍 Filtrar por nome, categoria..." oninput="renderSheet()">
+  </div>
+
+  <div class="sheet-wrap">
+    <div class="sheet-table-container">
+      <table class="sheet" id="sheet-table">
+        <thead>
+          <tr>
+            <th class="col-num" onclick="" title="Selecionar tudo"><input type="checkbox" id="select-all-cb" onchange="sheetSelectAll(this.checked)" style="cursor:pointer"></th>
+            <th onclick="sheetSort('date')">Data</th>
+            <th onclick="sheetSort('name')">Estabelecimento</th>
+            <th onclick="sheetSort('cat')">Categoria</th>
+            <th onclick="sheetSort('value')">Valor R$</th>
+            <th onclick="sheetSort('fatura')">Fatura</th>
+            <th onclick="sheetSort('cartao')">Cartão</th>
+            <th onclick="sheetSort('parcela')">Parcela</th>
+          </tr>
+        </thead>
+        <tbody id="sheet-tbody"></tbody>
+      </table>
+    </div>
+    <div class="sheet-footer">
+      <span id="sheet-footer-info">Carregando...</span>
+      <span id="sheet-footer-sum"></span>
+    </div>
+  </div>
+
+</div><!-- /panel-sheet -->
+
+<!-- Delete confirm dialog -->
+
+<div class="del-confirm" id="del-confirm">
+  <div class="del-confirm-box">
+    <h4>🗑️ Excluir linhas?</h4>
+    <p id="del-confirm-msg">Isso removerá as transações selecionadas.</p>
+    <div class="del-confirm-btns">
+      <button class="btn-sheet primary" onclick="sheetConfirmDelete()">Excluir</button>
+      <button class="btn-sheet" onclick="document.getElementById('del-confirm').classList.remove('open')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <!-- Modal -->
@@ -816,8 +1081,19 @@ header { padding: 18px 16px; flex-direction: column; align-items: flex-start; ga
         <option value="Hobby">🎮 Hobby</option>
       </select>
     </div>
+    <div class="edit-field">
+      <label>Valor (R$)</label>
+      <input type="number" id="edit-value-input" step="0.01" placeholder="0,00" style="text-align:right">
+    </div>
+    <!-- Propagação para parcelas irmãs -->
+    <div id="edit-propagate-section" style="display:none; margin-bottom:14px; padding:12px 14px; background:#FDF3E7; border-radius:10px; border:1.5px solid #E8C87A;">
+      <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:0.82rem; font-weight:500; color:#7A4A18;">
+        <input type="checkbox" id="edit-propagate-checkbox" style="margin-top:2px; cursor:pointer; accent-color:#C8843A; flex-shrink:0;">
+        <span id="edit-propagate-info"></span>
+      </label>
+    </div>
     <div class="edit-actions">
-      <button class="edit-save" onclick="saveEdit()">✅ Salvar e atualizar gráficos</button>
+      <button class="edit-save" onclick="saveEdit()">✅ Salvar e atualizar</button>
       <button class="edit-cancel" onclick="closeEditModal()">Cancelar</button>
     </div>
   </div>
@@ -1541,19 +1817,52 @@ function closeModal(e) {
 }
 
 // =============================================
-// EDIT MODAL
+// EDIT MODAL — com propagação para parcelas
 // =============================================
 let editingId = null;
+
+// Encontra todas as parcelas irmãs de uma transação
+// (mesmo nome original, mesmo cartão, qualquer fatura)
+function findSiblingParcels(t) {
+  if(!t.parcela) return []; // não é parcelada
+  // Usa o nome base: se já foi editado, usa _originalName, senão usa name
+  const baseName = t._originalName || t.name;
+  return allData.filter(x =>
+    x._id !== t._id &&
+    x.parcela &&
+    (x._originalName || x.name) === baseName &&
+    x.cartao === t.cartao
+  );
+}
 
 function openEditModal(id) {
   const t = allData.find(x => x._id === id);
   if(!t) return;
   editingId = id;
 
+  const fatLabel = {mar:'Março',abr:'Abril',mai:'Maio'}[t.fatura] || t.fatura;
+  const siblings = findSiblingParcels(t);
+
   document.getElementById('edit-modal-title').textContent = '✏️ Editar Transação';
-  document.getElementById('edit-modal-sub').textContent = `${t.date} · ${fmt(t.value)} · Fatura ${t.fatura==='abr'?'Abril':'Março'}/26`;
+  document.getElementById('edit-modal-sub').textContent =
+    `${t.date} · ${fmt(t.value)} · ${fatLabel}/26${t.parcela ? ` · Parcela ${t.parcela}` : ''}`;
   document.getElementById('edit-name-input').value = t.name;
   document.getElementById('edit-cat-select').value = t.cat;
+  document.getElementById('edit-value-input').value = t.value;
+
+  // Mostra/esconde opção de propagação
+  const propagateSection = document.getElementById('edit-propagate-section');
+  const propagateInfo = document.getElementById('edit-propagate-info');
+  if(siblings.length > 0) {
+    propagateSection.style.display = 'block';
+    // Lista as faturas irmãs
+    const faturas = siblings.map(s => ({mar:'Mar',abr:'Abr',mai:'Mai'}[s.fatura]||s.fatura));
+    const unique = [...new Set(faturas)].join(', ');
+    propagateInfo.textContent = `Esta compra tem ${siblings.length} parcela${siblings.length>1?'s':''} em outras faturas (${unique}). Aplicar a todas?`;
+    document.getElementById('edit-propagate-checkbox').checked = true; // padrão: propagar
+  } else {
+    propagateSection.style.display = 'none';
+  }
 
   document.getElementById('edit-modal-overlay').classList.add('open');
   setTimeout(() => document.getElementById('edit-name-input').focus(), 80);
@@ -1569,25 +1878,53 @@ function saveEdit() {
   const idx = allData.findIndex(x => x._id === editingId);
   if(idx === -1) return;
 
-  const newName = document.getElementById('edit-name-input').value.trim();
-  const newCat  = document.getElementById('edit-cat-select').value;
-
+  const newName  = document.getElementById('edit-name-input').value.trim();
+  const newCat   = document.getElementById('edit-cat-select').value;
+  const newValue = parseFloat(document.getElementById('edit-value-input').value) || t.value;
   if(!newName) { document.getElementById('edit-name-input').focus(); return; }
 
-  const oldCat = allData[idx].cat;
-  allData[idx] = { ...allData[idx], name: newName, cat: newCat, _edited: true };
+  const t = allData[idx];
+  const oldCat = t.cat;
+  const propagate = t.parcela &&
+    document.getElementById('edit-propagate-section').style.display !== 'none' &&
+    document.getElementById('edit-propagate-checkbox').checked;
 
+  // IDs a atualizar: sempre a transação atual
+  const idsToUpdate = [t._id];
+
+  // Se propagar, adiciona as irmãs
+  if(propagate) {
+    findSiblingParcels(t).forEach(s => idsToUpdate.push(s._id));
+  }
+
+  // Aplica alterações
+  idsToUpdate.forEach(targetId => {
+    const i = allData.findIndex(x => x._id === targetId);
+    if(i === -1) return;
+    allData[i] = {
+      ...allData[i],
+      name: newName,
+      cat: newCat,
+      value: targetId === t._id ? newValue : allData[i].value, // valor só muda na atual, não nas irmãs
+      _edited: true,
+      _originalName: allData[i]._originalName || allData[i].name,
+    };
+  });
+
+  // Sync sheetData to reflect changes
+  sheetSync();
+
+  const updatedCount = idsToUpdate.length;
   closeEditModal();
 
-  // Full re-render so every section reflects the change
+  // Re-render completo
   renderKPIs();
   renderCharts();
   renderCategories();
   renderAttention();
   renderInsights();
 
-  // If the panel was open, re-open on the right category
-  // If cat changed, switch panel to new cat; else refresh current
+  // Reabre painel na categoria certa
   const targetCat = newCat !== oldCat ? newCat : selectedCat;
   if(selectedCat) {
     selectedCat = targetCat;
@@ -1595,21 +1932,290 @@ function saveEdit() {
     showTransactions(targetCat);
   }
 
-  // Flash the updated row briefly
+  // Toast de confirmação
+  showToast(
+    updatedCount > 1
+      ? `✅ ${updatedCount} parcelas atualizadas em todas as faturas`
+      : '✅ Transação atualizada'
+  );
+
+  // Flash nas linhas atualizadas
   setTimeout(() => {
-    const row = document.getElementById(`txn-row-${editingId === null ? allData[idx]._id : allData.find(x=>x.name===newName&&x._edited)._id}`);
-    if(row) {
-      row.style.transition = 'background 0.3s';
-      row.style.background = '#FDF3E7';
-      setTimeout(() => row.style.background = '', 1200);
-    }
-  }, 100);
+    idsToUpdate.forEach(uid => {
+      const row = document.getElementById(`txn-row-${uid}`);
+      if(row) {
+        row.style.transition = 'background 0.4s';
+        row.style.background = '#FDF3E7';
+        setTimeout(() => row.style.background = '', 1400);
+      }
+    });
+  }, 80);
+}
+
+// Toast notification
+function showToast(msg) {
+  let toast = document.getElementById('edit-toast');
+  if(!toast) {
+    toast = document.createElement('div');
+    toast.id = 'edit-toast';
+    toast.style.cssText = `
+      position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px);
+      background:#4A2E18; color:#fff; padding:12px 24px; border-radius:30px;
+      font-size:0.88rem; font-weight:600; z-index:3000;
+      box-shadow:0 8px 32px rgba(44,30,15,0.25);
+      transition:transform 0.3s cubic-bezier(.34,1.56,.64,1), opacity 0.3s;
+      opacity:0; pointer-events:none; white-space:nowrap;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  toast.style.opacity = '1';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.style.transform = 'translateX(-50%) translateY(80px)';
+    toast.style.opacity = '0';
+  }, 3000);
 }
 
 // Close edit modal clicking backdrop
 document.getElementById('edit-modal-overlay').addEventListener('click', e => {
   if(e.target === document.getElementById('edit-modal-overlay')) closeEditModal();
 });
+
+// =============================================
+// TAB SWITCHING
+// =============================================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if(tab === 'sheet') renderSheet();
+  if(tab === 'dash') renderCharts(); // re-render charts after tab switch
+}
+
+// =============================================
+// SPREADSHEET ENGINE
+// =============================================
+let sheetData = [];       // working copy — editable
+let sheetDirty = false;   // tracks unsaved changes vs allData
+let sheetSelected = new Set(); // selected row _ids
+let sheetSortCol = 'date';
+let sheetSortDir = 1;     // 1 = asc, -1 = desc
+
+const FATURAS_OPTS = ['mar','abr','mai'];
+const CARTAO_OPTS  = ['2040','1518','0904','serv'];
+const FATURAS_LABEL = {mar:'Março/26', abr:'Abril/26', mai:'Maio/26'};
+
+// Clone allData into sheetData
+function sheetSync() {
+  sheetData = allData.map(t => ({...t}));
+  sheetDirty = false;
+  setSyncBadge(false);
+}
+
+function setSyncBadge(dirty) {
+  sheetDirty = dirty;
+  const b = document.getElementById('sync-badge');
+  if(dirty) {
+    b.textContent = '⚠️ Alterações pendentes';
+    b.className = 'sheet-sync-badge dirty';
+  } else {
+    b.textContent = '✅ Sincronizado';
+    b.className = 'sheet-sync-badge';
+  }
+}
+
+function sheetSort(col) {
+  if(sheetSortCol === col) sheetSortDir *= -1;
+  else { sheetSortCol = col; sheetSortDir = 1; }
+  // Update header classes
+  document.querySelectorAll('table.sheet thead th').forEach(th => {
+    th.classList.remove('sorted-asc','sorted-desc');
+  });
+  const cols = ['','date','name','cat','value','fatura','cartao','parcela'];
+  const idx = cols.indexOf(col);
+  if(idx > 0) {
+    const th = document.querySelectorAll('table.sheet thead th')[idx];
+    if(th) th.classList.add(sheetSortDir === 1 ? 'sorted-asc' : 'sorted-desc');
+  }
+  renderSheet();
+}
+
+function renderSheet() {
+  if(sheetData.length === 0) sheetSync();
+
+  const query = (document.getElementById('sheet-search')?.value || '').toLowerCase();
+  let rows = [...sheetData];
+
+  // Filter
+  if(query) {
+    rows = rows.filter(t =>
+      (t.name||'').toLowerCase().includes(query) ||
+      (t.cat||'').toLowerCase().includes(query) ||
+      (t.fatura||'').toLowerCase().includes(query) ||
+      (t.cartao||'').toLowerCase().includes(query) ||
+      String(t.value||'').includes(query)
+    );
+  }
+
+  // Sort
+  rows.sort((a,b) => {
+    let av = a[sheetSortCol] ?? '', bv = b[sheetSortCol] ?? '';
+    if(sheetSortCol === 'value') { av = Number(av)||0; bv = Number(bv)||0; }
+    else { av = String(av).toLowerCase(); bv = String(bv).toLowerCase(); }
+    return av < bv ? -sheetSortDir : av > bv ? sheetSortDir : 0;
+  });
+
+  const tbody = document.getElementById('sheet-tbody');
+  tbody.innerHTML = rows.map((t, rowIdx) => {
+    const conf = CAT_CONFIG[t.cat] || {color:'#aaa'};
+    const isNew = !!t._new;
+    const isSel = sheetSelected.has(t._id);
+    return `
+    <tr data-id="${t._id}" class="${isNew?'new-row':''} ${isSel?'selected':''}" onclick="sheetRowClick(event, ${t._id})">
+      <td class="col-num">
+        <input type="checkbox" ${isSel?'checked':''} onchange="sheetToggleSelect(${t._id}, this.checked)" onclick="e=>e.stopPropagation()">
+      </td>
+      <td><input class="cell-input" value="${esc(t.date||'')}" onchange="sheetCellChange(${t._id},'date',this.value)" placeholder="DD/MM"></td>
+      <td><input class="cell-input" style="min-width:160px" value="${esc(t.name||'')}" onchange="sheetCellChange(${t._id},'name',this.value)" placeholder="Nome"></td>
+      <td>
+        <select class="cell-input" onchange="sheetCellChange(${t._id},'cat',this.value)">
+          ${Object.keys(CAT_CONFIG).map(c => `<option value="${c}" ${t.cat===c?'selected':''}>${CAT_CONFIG[c].icon} ${c}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="cell-input cell-value" type="number" step="0.01" value="${t.value||0}" onchange="sheetCellChange(${t._id},'value',parseFloat(this.value)||0)" style="min-width:90px"></td>
+      <td>
+        <select class="cell-input" onchange="sheetCellChange(${t._id},'fatura',this.value)">
+          ${FATURAS_OPTS.map(f => `<option value="${f}" ${t.fatura===f?'selected':''}>${FATURAS_LABEL[f]||f}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select class="cell-input" onchange="sheetCellChange(${t._id},'cartao',this.value)">
+          ${CARTAO_OPTS.map(c => `<option value="${c}" ${t.cartao===c?'selected':''}>•••${c}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="cell-input" value="${esc(t.parcela||'')}" onchange="sheetCellChange(${t._id},'parcela',this.value||null)" placeholder="01/12"></td>
+    </tr>`;
+  }).join('');
+
+  // Footer stats
+  const total = rows.filter(t=>t.value>0).reduce((s,t)=>s+t.value,0);
+  document.getElementById('sheet-footer-info').innerHTML =
+    `<strong>${rows.length}</strong> linhas · <strong>${sheetData.length}</strong> total · <strong>${sheetSelected.size}</strong> selecionadas`;
+  document.getElementById('sheet-footer-sum').innerHTML =
+    `Soma (positivos): <strong>${fmt(total)}</strong>`;
+
+  // Toggle bulk action buttons
+  const hasSel = sheetSelected.size > 0;
+  document.getElementById('btn-del-sel').style.display = hasSel ? 'flex' : 'none';
+  document.getElementById('btn-dup-sel').style.display = hasSel ? 'flex' : 'none';
+}
+
+function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function sheetCellChange(id, field, value) {
+  const idx = sheetData.findIndex(t => t._id === id);
+  if(idx === -1) return;
+  sheetData[idx] = {...sheetData[idx], [field]: value, _edited: true};
+  setSyncBadge(true);
+}
+
+function sheetRowClick(e, id) {
+  // Only toggle selection when clicking the row bg, not an input/select
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  sheetToggleSelect(id, !sheetSelected.has(id));
+}
+
+function sheetToggleSelect(id, checked) {
+  if(checked) sheetSelected.add(id);
+  else sheetSelected.delete(id);
+  renderSheet();
+}
+
+function sheetSelectAll(checked) {
+  if(checked) sheetData.forEach(t => sheetSelected.add(t._id));
+  else sheetSelected.clear();
+  renderSheet();
+}
+
+function sheetAddRow() {
+  const newId = Math.max(...sheetData.map(t=>t._id), 0) + 1;
+  const newRow = {
+    _id: newId, _new: true,
+    date: '', name: '', cat: 'Alimentação',
+    value: 0, fatura: 'mai', cartao: '2040', parcela: null
+  };
+  sheetData.unshift(newRow); // add at top
+  setSyncBadge(true);
+  renderSheet();
+  // Focus first input of new row
+  setTimeout(() => {
+    const firstInput = document.querySelector('#sheet-tbody tr:first-child input');
+    if(firstInput) firstInput.focus();
+  }, 50);
+}
+
+function sheetDeleteSelected() {
+  if(sheetSelected.size === 0) return;
+  const msg = document.getElementById('del-confirm-msg');
+  msg.textContent = `Isso removerá ${sheetSelected.size} linha${sheetSelected.size>1?'s':''} permanentemente.`;
+  document.getElementById('del-confirm').classList.add('open');
+}
+
+function sheetConfirmDelete() {
+  sheetData = sheetData.filter(t => !sheetSelected.has(t._id));
+  sheetSelected.clear();
+  document.getElementById('del-confirm').classList.remove('open');
+  setSyncBadge(true);
+  renderSheet();
+}
+
+function sheetDuplicateSelected() {
+  const maxId = Math.max(...sheetData.map(t=>t._id), 0);
+  let counter = 1;
+  const dupes = [];
+  sheetData.forEach(t => {
+    if(sheetSelected.has(t._id)) {
+      dupes.push({...t, _id: maxId + counter++, _new: true, _edited: true});
+    }
+  });
+  sheetData = [...sheetData, ...dupes];
+  setSyncBadge(true);
+  renderSheet();
+  showToast(`⧉ ${dupes.length} linha${dupes.length>1?'s':''} duplicadas`);
+}
+
+// Apply sheet changes to Dashboard
+function sheetApplyToDash() {
+  if(!sheetDirty) { showToast('✅ Já está sincronizado'); return; }
+
+  // Validate: filter out empty/invalid rows
+  const valid = sheetData.filter(t => t.name && t.name.trim() && !isNaN(t.value));
+  const skipped = sheetData.length - valid.length;
+
+  allData = valid.map((t, i) => ({
+    ...t,
+    _id: i,
+    value: parseFloat(t.value) || 0,
+    name: (t.name||'').trim(),
+  }));
+
+  // Re-sync sheet with clean ids
+  sheetData = allData.map(t => ({...t}));
+  setSyncBadge(false);
+  sheetSelected.clear();
+
+  // Refresh dashboard
+  renderAll();
+
+  const msg = skipped > 0
+    ? `✅ Dashboard atualizado! ${skipped} linha${skipped>1?'s':''} ignoradas (sem nome/valor)`
+    : `✅ Dashboard atualizado com ${allData.length} transações`;
+  showToast(msg);
+  renderSheet();
+}
 
 // =============================================
 // RENDER ALL
@@ -1624,6 +2230,7 @@ function renderAll() {
 
 // Init
 renderAll();
+sheetSync(); // initialize sheet mirror
 </script>
 
 </body>
