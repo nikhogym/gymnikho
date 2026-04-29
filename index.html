@@ -955,9 +955,9 @@ header { padding: 18px 16px; flex-direction: column; align-items: flex-start; ga
   <div class="filters-bar">
     <span class="filter-label">Fatura:</span>
     <button class="filter-btn active" onclick="setFaturaFilter('all', this)">Todas</button>
-    <button class="filter-btn" onclick="setFaturaFilter('mai', this)">Maio/26 🔴 aberta</button>
-    <button class="filter-btn" onclick="setFaturaFilter('abr', this)">Abril/26 (R$3.188)</button>
-    <button class="filter-btn" onclick="setFaturaFilter('mar', this)">Março/26 (R$3.940)</button>
+    <button class="filter-btn" onclick="setFaturaFilter('mai', this)" id="filter-btn-mai">Maio/26 🔴 aberta</button>
+    <button class="filter-btn" onclick="setFaturaFilter('abr', this)" id="filter-btn-abr">Abril/26</button>
+    <button class="filter-btn" onclick="setFaturaFilter('mar', this)" id="filter-btn-mar">Março/26</button>
   </div>
   <div class="category-grid" id="category-grid"><!-- JS --></div>
 
@@ -994,6 +994,17 @@ header { padding: 18px 16px; flex-direction: column; align-items: flex-start; ga
     <button class="btn-sheet primary" onclick="sheetApplyToDash()" id="btn-apply">🔄 Aplicar ao Dashboard</button>
     <span class="sheet-sync-badge" id="sync-badge">✅ Sincronizado</span>
     <input class="sheet-search" type="text" id="sheet-search" placeholder="🔍 Filtrar por nome, categoria..." oninput="renderSheet()">
+  </div>
+
+  <!-- Filtros de fatura -->
+
+  <div class="filters-bar" style="margin-bottom:14px">
+    <span class="filter-label">Fatura:</span>
+    <button class="filter-btn active" id="sf-all" onclick="setSheetFilter('all',this)">Todas</button>
+    <button class="filter-btn" id="sf-mai" onclick="setSheetFilter('mai',this)">Maio/26 🔴</button>
+    <button class="filter-btn" id="sf-abr" onclick="setSheetFilter('abr',this)">Abril/26</button>
+    <button class="filter-btn" id="sf-mar" onclick="setSheetFilter('mar',this)">Março/26</button>
+    <span style="margin-left:auto; font-size:0.78rem; color:#B0A090" id="sheet-filter-count"></span>
   </div>
 
   <div class="sheet-wrap">
@@ -1353,7 +1364,8 @@ const FATURAS = [
 ];
 
 function getFaturaTotal(key) {
-  return sumBy(allData.filter(t => t.fatura === key && t.value > 0), 'value');
+  // Inclui estornos (valores negativos) para o total correto da fatura
+  return sumBy(allData.filter(t => t.fatura === key), 'value');
 }
 
 // =============================================
@@ -1432,6 +1444,14 @@ function renderKPIs() {
       ${k.badge ? `<span class="kpi-badge ${k.badge.cls}">${k.badge.txt}</span>` : ''}
     </div>
   `).join('');
+
+  // Update dashboard filter button labels with live totals
+  const btnMai = document.getElementById('filter-btn-mai');
+  const btnAbr = document.getElementById('filter-btn-abr');
+  const btnMar = document.getElementById('filter-btn-mar');
+  if(btnMai) btnMai.textContent = `Maio/26 🔴 · ${fmt(maiTotal)}`;
+  if(btnAbr) btnAbr.textContent = `Abril/26 · ${fmt(abrTotal)}`;
+  if(btnMar) btnMar.textContent = `Março/26 · ${fmt(marTotal)}`;
 }
 
 // =============================================
@@ -2003,10 +2023,18 @@ let sheetDirty = false;   // tracks unsaved changes vs allData
 let sheetSelected = new Set(); // selected row _ids
 let sheetSortCol = 'date';
 let sheetSortDir = 1;     // 1 = asc, -1 = desc
+let sheetFaturaFilter = 'all'; // fatura filter for sheet
 
 const FATURAS_OPTS = ['mar','abr','mai'];
 const CARTAO_OPTS  = ['2040','1518','0904','serv'];
 const FATURAS_LABEL = {mar:'Março/26', abr:'Abril/26', mai:'Maio/26'};
+
+function setSheetFilter(val, btn) {
+  sheetFaturaFilter = val;
+  document.querySelectorAll('#panel-sheet .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSheet();
+}
 
 // Clone allData into sheetData
 function sheetSync() {
@@ -2046,10 +2074,25 @@ function sheetSort(col) {
 function renderSheet() {
   if(sheetData.length === 0) sheetSync();
 
+  // Update filter button labels with live totals
+  FATURAS_OPTS.forEach(f => {
+    const btn = document.getElementById('sf-' + f);
+    if(!btn) return;
+    const total = sheetData.filter(t => t.fatura === f).reduce((s,t) => s + (t.value||0), 0);
+    const labels = {mar:'Março/26', abr:'Abril/26', mai:'Maio/26 🔴'};
+    const count = sheetData.filter(t => t.fatura === f).length;
+    btn.textContent = `${labels[f]} · ${fmt(total)} (${count})`;
+  });
+
   const query = (document.getElementById('sheet-search')?.value || '').toLowerCase();
   let rows = [...sheetData];
 
-  // Filter
+  // Fatura filter
+  if(sheetFaturaFilter !== 'all') {
+    rows = rows.filter(t => t.fatura === sheetFaturaFilter);
+  }
+
+  // Text filter
   if(query) {
     rows = rows.filter(t =>
       (t.name||'').toLowerCase().includes(query) ||
@@ -2101,11 +2144,18 @@ function renderSheet() {
   }).join('');
 
   // Footer stats
-  const total = rows.filter(t=>t.value>0).reduce((s,t)=>s+t.value,0);
+  const visiblePositiveSum = rows.filter(t=>t.value>0).reduce((s,t)=>s+t.value,0);
+  const visibleTotal = rows.reduce((s,t)=>s+(t.value||0),0);
+  const filterCount = document.getElementById('sheet-filter-count');
+  if(filterCount) {
+    filterCount.textContent = sheetFaturaFilter !== 'all'
+      ? `${rows.length} de ${sheetData.length} transações`
+      : '';
+  }
   document.getElementById('sheet-footer-info').innerHTML =
-    `<strong>${rows.length}</strong> linhas · <strong>${sheetData.length}</strong> total · <strong>${sheetSelected.size}</strong> selecionadas`;
+    `<strong>${rows.length}</strong> linhas visíveis · <strong>${sheetData.length}</strong> total · <strong>${sheetSelected.size}</strong> selecionadas`;
   document.getElementById('sheet-footer-sum').innerHTML =
-    `Soma (positivos): <strong>${fmt(total)}</strong>`;
+    `Total (c/ estornos): <strong>${fmt(visibleTotal)}</strong> &nbsp;·&nbsp; Somente positivos: <strong>${fmt(visiblePositiveSum)}</strong>`;
 
   // Toggle bulk action buttons
   const hasSel = sheetSelected.size > 0;
